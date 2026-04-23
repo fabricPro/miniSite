@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Mini Todo</title>
+  <title>Iplik Numara Cevirici</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,47 +17,53 @@
 <body>
   <div class="app">
     <header class="app-bar">
-      <h1>Mini Todo</h1>
-      <button id="clearDone" class="icon-btn" title="Tamamlananlari temizle" aria-label="Tamamlananlari temizle">
+      <h1>Iplik Numara Cevirici</h1>
+      <button id="clearBtn" class="icon-btn" title="Tumunu temizle" aria-label="Tumunu temizle">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
           <path fill="currentColor" d="M9 3v1H4v2h1l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14h1V4h-5V3H9zm2 5h2v10h-2V8zm-4 0h2v10H7V8zm8 0h2v10h-2V8z"/>
         </svg>
       </button>
     </header>
 
-    <section class="stats" id="stats" aria-live="polite">
-      <span id="countText">0 gorev</span>
-      <div class="filters" role="tablist">
-        <button class="chip active" data-filter="all" role="tab" aria-selected="true">Tumu</button>
-        <button class="chip" data-filter="active" role="tab" aria-selected="false">Aktif</button>
-        <button class="chip" data-filter="done" role="tab" aria-selected="false">Bitti</button>
-      </div>
-    </section>
+    <main class="converter">
+      <section class="card">
+        <h2 class="card-title">Numune</h2>
+        <div class="grid-2">
+          <label class="field">
+            <span>Gramaj (g)</span>
+            <input id="weight" type="number" inputmode="decimal" step="0.001" min="0" placeholder="0.000" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Uzunluk (cm)</span>
+            <input id="length" type="number" inputmode="decimal" step="0.1" min="0" placeholder="0" autocomplete="off" />
+          </label>
+        </div>
+      </section>
 
-    <main class="list-wrap">
-      <ul id="todoList" class="todo-list" aria-label="Gorev listesi"></ul>
-      <div id="empty" class="empty">
-        <div class="empty-emoji" aria-hidden="true">+</div>
-        <p>Henuz gorev yok.<br/>Alttan yeni bir gorev ekle.</p>
-      </div>
+      <section class="card">
+        <h2 class="card-title">Numara</h2>
+        <div class="grid-2">
+          <label class="field">
+            <span>Ne <small>(pamuk)</small></span>
+            <input id="ne" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Nm <small>(metrik)</small></span>
+            <input id="nm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>Denye <small>(den)</small></span>
+            <input id="den" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>dtex</span>
+            <input id="dtex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+          </label>
+        </div>
+      </section>
+
+      <p class="hint">Gramaj + uzunluk girersen 4 numara otomatik hesaplanir. Numara alanlarindan birine yazarsan diger 3 numara guncellenir.</p>
     </main>
-
-    <form id="addForm" class="add-bar" autocomplete="off">
-      <input
-        id="newTodo"
-        type="text"
-        name="todo"
-        placeholder="Yeni gorev..."
-        enterkeyhint="done"
-        maxlength="140"
-        required
-      />
-      <button id="addBtn" type="submit" class="fab" aria-label="Ekle">
-        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-          <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
-        </svg>
-      </button>
-    </form>
   </div>
 
   <script src="script.js"></script>

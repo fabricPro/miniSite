@@ -1,6 +1,6 @@
 {
-  "name": "Mini Todo",
-  "short_name": "Todo",
+  "name": "Iplik Numara Cevirici",
+  "short_name": "Iplik",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
@@ -8,7 +8,7 @@
   "background_color": "#FFFBFE",
   "theme_color": "#6750A4",
   "lang": "tr",
-  "description": "Basit ve hizli mini todo uygulamasi.",
+  "description": "Ne, Nm, Denye, dtex arasinda iplik numara donusumu.",
   "icons": [
     {
       "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%236750A4'/><path d='M60 98l22 22 50-56' fill='none' stroke='white' stroke-width='14' stroke-linecap='round' stroke-linejoin='round'/></svg>",
