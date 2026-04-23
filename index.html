@@ -2,57 +2,63 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mini Web Sitesi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#6750A4" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Mini Todo</title>
+  <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="hero">
-    <nav class="container nav">
-      <h1 class="logo">MiniSite</h1>
-      <a class="btn btn-outline" href="#iletisim">Iletisim</a>
-    </nav>
+  <div class="app">
+    <header class="app-bar">
+      <h1>Mini Todo</h1>
+      <button id="clearDone" class="icon-btn" title="Tamamlananlari temizle" aria-label="Tamamlananlari temizle">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path fill="currentColor" d="M9 3v1H4v2h1l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14h1V4h-5V3H9zm2 5h2v10h-2V8zm-4 0h2v10H7V8zm8 0h2v10h-2V8z"/>
+        </svg>
+      </button>
+    </header>
 
-    <section class="container hero-content">
-      <p class="badge">Hizli, sade, modern</p>
-      <h2>Kendi mini web siten hazir</h2>
-      <p>
-        Bu tek sayfalik tasarim, temel bir tanitim sitesi icin guzel bir baslangic sunar.
-        Renkleri, metinleri ve bolumleri kolayca duzenleyebilirsin.
-      </p>
-      <button id="themeButton" class="btn">Temayi Degistir</button>
-    </section>
-  </header>
-
-  <main class="container">
-    <section class="cards">
-      <article class="card">
-        <h3>Hizli Kurulum</h3>
-        <p>Yalnizca 3 dosya ile calisir: HTML, CSS ve JavaScript.</p>
-      </article>
-      <article class="card">
-        <h3>Duyarli Tasarim</h3>
-        <p>Telefon, tablet ve masaustunde temiz gorunur.</p>
-      </article>
-      <article class="card">
-        <h3>Kolay Ozellestirme</h3>
-        <p>Metinleri degistirip kendi markana uygun hale getirebilirsin.</p>
-      </article>
+    <section class="stats" id="stats" aria-live="polite">
+      <span id="countText">0 gorev</span>
+      <div class="filters" role="tablist">
+        <button class="chip active" data-filter="all" role="tab" aria-selected="true">Tumu</button>
+        <button class="chip" data-filter="active" role="tab" aria-selected="false">Aktif</button>
+        <button class="chip" data-filter="done" role="tab" aria-selected="false">Bitti</button>
+      </div>
     </section>
 
-    <section id="iletisim" class="contact">
-      <h3>Iletisim</h3>
-      <p>Sana ozel bir surum istersen bu ornegi birlikte gelistirebiliriz.</p>
-      <a class="btn" href="mailto:ornek@eposta.com">E-posta Gonder</a>
-    </section>
-  </main>
+    <main class="list-wrap">
+      <ul id="todoList" class="todo-list" aria-label="Gorev listesi"></ul>
+      <div id="empty" class="empty">
+        <div class="empty-emoji" aria-hidden="true">+</div>
+        <p>Henuz gorev yok.<br/>Alttan yeni bir gorev ekle.</p>
+      </div>
+    </main>
 
-  <footer class="container footer">
-    <small>&copy; 2026 MiniSite. Tum haklari saklidir.</small>
-  </footer>
+    <form id="addForm" class="add-bar" autocomplete="off">
+      <input
+        id="newTodo"
+        type="text"
+        name="todo"
+        placeholder="Yeni gorev..."
+        enterkeyhint="done"
+        maxlength="140"
+        required
+      />
+      <button id="addBtn" type="submit" class="fab" aria-label="Ekle">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+          <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
 
   <script src="script.js"></script>
 </body>
