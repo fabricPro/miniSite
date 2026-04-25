@@ -567,9 +567,11 @@
 
   // ───────── Boot ─────────
   function init() {
-    // Page tabs
-    $$(".page-tab").forEach(function (b) {
-      b.addEventListener("click", function () { goPage(b.dataset.page); });
+    // Page tabs (delegated for robust touch handling)
+    $("pageTabs").addEventListener("click", function (e) {
+      var tab = e.target.closest(".page-tab");
+      if (!tab) return;
+      goPage(tab.dataset.page);
     });
 
     bindConverter();
