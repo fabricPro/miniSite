@@ -27,6 +27,7 @@
 
   // ───────── State ─────────
   var state = {
+    page: "converter",
     step: 1,
     currentRecordId: null,
     currentRecordName: "",
@@ -117,6 +118,26 @@
     return false;
   }
 
+  // ───────── Page navigation ─────────
+  function goPage(name) {
+    state.page = name;
+    $("pageConverter").hidden = name !== "converter";
+    $("pageMaliyet").hidden  = name !== "maliyet";
+    $("wizardSub").hidden    = name !== "maliyet";
+    $("openRecords").hidden  = name !== "maliyet";
+    $$(".page-tab").forEach(function (b) {
+      var on = b.dataset.page === name;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", String(on));
+    });
+    if (name === "maliyet") {
+      goStep(state.step);
+    } else {
+      $("bottomNav").hidden = true;
+    }
+    window.scrollTo(0, 0);
+  }
+
   // ───────── Step navigation ─────────
   function goStep(n) {
     if (n < 1) n = 1;
@@ -129,7 +150,7 @@
     $("stepTitle").textContent = STEP_TITLES[n];
     $("progressBar").style.width = (n / TOTAL_STEPS) * 100 + "%";
 
-    $("bottomNav").hidden = n === TOTAL_STEPS;
+    $("bottomNav").hidden = state.page !== "maliyet" || n === TOTAL_STEPS;
 
     $("prevBtn").disabled = n === 1;
     refreshNext();
@@ -353,6 +374,7 @@
     syncInputsFromState();
     renderYarnList("cozgu");
     renderYarnList("atki");
+    goPage("maliyet");
     goStep(5);
   }
 
@@ -463,8 +485,97 @@
     if (tipPop) { tipPop.hidden = true; tipPop = null; }
   }
 
+  // ───────── Converter (yarn count) ─────────
+  var NE_K = 590.54;
+
+  function convFmt(n) {
+    if (!Number.isFinite(n) || n <= 0) return "";
+    var rounded = Math.round(n * 1000) / 1000;
+    return String(rounded);
+  }
+
+  function texToCounts(tex) {
+    return {
+      ne: NE_K / tex,
+      nm: 1000 / tex,
+      den: tex * 9,
+      dtex: tex * 10,
+    };
+  }
+
+  function texFromCount(id, v) {
+    if (id === "convNe")   return NE_K / v;
+    if (id === "convNm")   return 1000 / v;
+    if (id === "convDen")  return v / 9;
+    if (id === "convDtex") return v / 10;
+    return null;
+  }
+
+  function convReadPos(elInput) {
+    var v = parseFloat(elInput.value);
+    return Number.isFinite(v) && v > 0 ? v : null;
+  }
+
+  function convWriteCounts(counts, skipId) {
+    var map = { convNe: "ne", convNm: "nm", convDen: "den", convDtex: "dtex" };
+    Object.keys(map).forEach(function (k) {
+      if (k === skipId) return;
+      $(k).value = convFmt(counts[map[k]]);
+    });
+  }
+
+  function convClearCounts(skipId) {
+    ["convNe", "convNm", "convDen", "convDtex"].forEach(function (k) {
+      if (k === skipId) return;
+      $(k).value = "";
+    });
+  }
+
+  function convRecomputeFromSample() {
+    var w = convReadPos($("convWeight"));
+    var l = convReadPos($("convLength"));
+    if (w === null || l === null) {
+      convClearCounts(null);
+      return;
+    }
+    var tex = (w * 100000) / l;
+    convWriteCounts(texToCounts(tex), null);
+  }
+
+  function convRecomputeFromCount(sourceId) {
+    var v = convReadPos($(sourceId));
+    if (v === null) { convClearCounts(sourceId); return; }
+    var tex = texFromCount(sourceId, v);
+    if (!Number.isFinite(tex) || tex <= 0) { convClearCounts(sourceId); return; }
+    convWriteCounts(texToCounts(tex), sourceId);
+  }
+
+  function bindConverter() {
+    ["convWeight", "convLength"].forEach(function (id) {
+      $(id).addEventListener("input", convRecomputeFromSample);
+    });
+    ["convNe", "convNm", "convDen", "convDtex"].forEach(function (id) {
+      $(id).addEventListener("input", function () { convRecomputeFromCount(id); });
+    });
+    $("convClear").addEventListener("click", function () {
+      ["convWeight", "convLength", "convNe", "convNm", "convDen", "convDtex"].forEach(function (id) {
+        $(id).value = "";
+      });
+      $("convWeight").focus();
+    });
+  }
+
   // ───────── Boot ─────────
   function init() {
+    // Page tabs (delegated for robust touch handling)
+    $("pageTabs").addEventListener("click", function (e) {
+      var tab = e.target.closest(".page-tab");
+      if (!tab) return;
+      goPage(tab.dataset.page);
+    });
+
+    bindConverter();
+
     // Step 1 fields
     bindFisInput("tarakEn", "tarakEn", { fn: isPos, msg: "Pozitif sayı girin" });
     bindFisInput("cozguSik", "cozguSik", { fn: isPos, msg: "Pozitif sayı girin" });
@@ -518,6 +629,7 @@
 
     bindTooltips();
     goStep(1);
+    goPage("converter");
   }
 
   // SW register

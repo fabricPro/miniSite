@@ -17,22 +17,70 @@
   <div class="app">
     <header class="topbar">
       <div class="topbar-row">
-        <h1 class="title">Armür Maliyet</h1>
-        <button id="openRecords" class="btn-ghost" type="button" aria-label="Kayıtlar">
-          <span aria-hidden="true">📁</span> Kayıtlar
+        <div id="pageTabs" class="page-tabs" role="tablist">
+          <button type="button" class="page-tab active" data-page="converter" role="tab" aria-selected="true">Çevirici</button>
+          <button type="button" class="page-tab" data-page="maliyet" role="tab" aria-selected="false">Maliyet</button>
+        </div>
+        <button id="openRecords" class="btn-ghost" type="button" aria-label="Kayıtlar" hidden>
+          <span aria-hidden="true">📁</span>
         </button>
       </div>
-      <div class="topbar-row sub">
-        <span id="stepChip" class="chip">1/5</span>
-        <span id="stepTitle" class="step-title">Kumaş ölçüleri</span>
-      </div>
-      <div class="progress" aria-hidden="true">
-        <div id="progressBar" class="progress-bar" style="width:20%"></div>
+      <div id="wizardSub" hidden>
+        <div class="topbar-row sub">
+          <span id="stepChip" class="chip">1/5</span>
+          <span id="stepTitle" class="step-title">Kumaş ölçüleri</span>
+        </div>
+        <div class="progress" aria-hidden="true">
+          <div id="progressBar" class="progress-bar" style="width:20%"></div>
+        </div>
       </div>
     </header>
 
     <main class="content">
-      <section id="pageMaliyet">
+      <!-- ───────── PAGE: Çevirici ───────── -->
+      <section id="pageConverter" class="page">
+        <div class="card">
+          <h2 class="card-title">Numune</h2>
+          <div class="grid-2">
+            <label class="field">
+              <div class="label-row"><span>Gramaj (g)</span></div>
+              <input id="convWeight" type="number" inputmode="decimal" step="0.001" min="0" placeholder="0.000" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>Uzunluk (cm)</span></div>
+              <input id="convLength" type="number" inputmode="decimal" step="0.1" min="0" placeholder="0" autocomplete="off" />
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Numara</h2>
+          <div class="grid-2">
+            <label class="field">
+              <div class="label-row"><span>Ne <small>(pamuk)</small></span></div>
+              <input id="convNe" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>Nm <small>(metrik)</small></span></div>
+              <input id="convNm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>Denye</span></div>
+              <input id="convDen" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>dtex</span></div>
+              <input id="convDtex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+          </div>
+        </div>
+
+        <button id="convClear" class="btn-secondary" type="button">Temizle</button>
+        <p class="hint">Gramaj + uzunluk girersen 4 numara hesaplanır. Numara alanlarından birine yazarsan diğer 3 numara güncellenir.</p>
+      </section>
+
+      <!-- ───────── PAGE: Maliyet (5-step wizard) ───────── -->
+      <section id="pageMaliyet" class="page" hidden>
       <!-- ADIM 1 — Kumaş ölçüleri -->
       <section class="step" data-step="1">
         <div class="card">
@@ -175,7 +223,7 @@
       </section><!-- /#pageMaliyet -->
     </main>
 
-    <nav id="bottomNav" class="bottombar">
+    <nav id="bottomNav" class="bottombar" hidden>
       <button id="prevBtn" class="btn-secondary" type="button">Geri</button>
       <button id="nextBtn" class="btn-primary" type="button" disabled>İleri</button>
     </nav>
