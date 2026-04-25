@@ -71,9 +71,8 @@
 
     var kursum = num(fis.kursum);
     var ekMal = num(fis.ekMal);
-    var kar = num(fis.kar);
 
-    var total = topI + fasI + terbM + kursum + ekMal + fireM + kar;
+    var total = topI + fasI + terbM + kursum + ekMal + fireM;
 
     return {
       topI: topI,

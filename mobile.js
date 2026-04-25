@@ -41,7 +41,6 @@
       genelFire: "2",
       kursum: "0",
       ekMal: "0",
-      kar: "0",
     },
     iplikler: {
       cozgu: [makeYarn()],
@@ -53,8 +52,8 @@
     return {
       id: "y_" + Math.random().toString(36).slice(2, 9),
       tip: "DENYE",
-      denye: "",
-      kat: "1",
+      // raw is the user-typed text (e.g. "300", "300*2", "30/2")
+      raw: "",
       tel: "",
       fiyat: "",
     };
@@ -75,10 +74,42 @@
         genelFire: "2",
         kursum: "0",
         ekMal: "0",
-        kar: "0",
       },
       iplikler: { cozgu: [makeYarn()], atki: [makeYarn()] },
     };
+  }
+
+  // ───────── Smart yarn-input parser ─────────
+  // DENYE/DTEX support "300*2" syntax; NE/NM support "30/2" syntax.
+  // Anything else with the wrong operator is invalid.
+  function parseYarnInput(raw, tip) {
+    if (raw == null) return { valid: false };
+    var s = String(raw).replace(/\s+/g, "").replace(",", ".");
+    if (!s) return { valid: false };
+
+    var multiTypes = { DENYE: 1, DTEX: 1 };
+    var divTypes   = { NE: 1, NM: 1 };
+
+    var m = /^(\d+(?:\.\d+)?)([*/])(\d+(?:\.\d+)?)$/.exec(s);
+    if (m) {
+      var op = m[2];
+      var num = parseFloat(m[1]);
+      var k   = parseFloat(m[3]);
+      if (!Number.isFinite(num) || num <= 0 || !Number.isFinite(k) || k <= 0) {
+        return { valid: false };
+      }
+      if (op === "*" && multiTypes[tip]) return { valid: true, num: num, kat: k };
+      if (op === "/" && divTypes[tip])   return { valid: true, num: num, kat: k };
+      return { valid: false, badOp: true };
+    }
+
+    if (/^\d+(?:\.\d+)?$/.test(s)) {
+      var n = parseFloat(s);
+      if (!Number.isFinite(n) || n <= 0) return { valid: false };
+      return { valid: true, num: n, kat: 1 };
+    }
+
+    return { valid: false };
   }
 
   // ───────── DOM helpers ─────────
@@ -95,8 +126,32 @@
     return Number.isFinite(n) && n >= 0;
   }
 
+  // Sync raw-text into denye+kat numeric fields (idempotent).
+  function syncYarnFromRaw(y) {
+    var r = parseYarnInput(y.raw, y.tip);
+    if (r.valid) {
+      y.denye = r.num;
+      y.kat = r.kat;
+    } else {
+      y.denye = 0;
+      y.kat = 1;
+    }
+    return r;
+  }
+
+  // Build a raw string from existing denye+kat (for records saved in old format).
+  function yarnRawFromValues(y) {
+    var den = parseFloat(y.denye);
+    var k = parseFloat(y.kat) || 1;
+    if (!Number.isFinite(den) || den <= 0) return "";
+    if (k <= 1) return String(den);
+    var op = (y.tip === "NE" || y.tip === "NM") ? "/" : "*";
+    return den + op + k;
+  }
+
   function yarnValid(y) {
-    return isPos(y.denye) && isNonNeg(y.kat) && parseFloat(y.kat) >= 1 && isPos(y.tel) && isPos(y.fiyat);
+    var r = parseYarnInput(y.raw, y.tip);
+    return r.valid && isPos(y.tel) && isPos(y.fiyat);
   }
 
   function stepValid(step) {
@@ -112,7 +167,7 @@
     if (step === 4) {
       var f = state.fis;
       return isPos(f.devir) && isNonNeg(f.randiman) && isNonNeg(f.terbiyeFiyat) &&
-             isNonNeg(f.genelFire) && isNonNeg(f.kursum) && isNonNeg(f.ekMal) && isNonNeg(f.kar);
+             isNonNeg(f.genelFire) && isNonNeg(f.kursum) && isNonNeg(f.ekMal);
     }
     if (step === 5) return true;
     return false;
@@ -155,10 +210,16 @@
 
     renderResult();
 
-    if (opts.scroll !== false) {
-      var sec = document.querySelector('#pageMaliyet section.step[data-step="' + n + '"]');
-      if (sec) {
-        var topbar = $("topbar") || document.querySelector(".topbar");
+    var sec = document.querySelector('#pageMaliyet section.step[data-step="' + n + '"]');
+    if (sec) {
+      // Expand the target accordion so its content is visible
+      if (sec.classList.contains("collapsed")) {
+        sec.classList.remove("collapsed");
+        var hd = sec.querySelector(".step-heading");
+        if (hd) hd.setAttribute("aria-expanded", "true");
+      }
+      if (opts.scroll !== false) {
+        var topbar = document.querySelector(".topbar");
         var off = topbar ? topbar.offsetHeight : 0;
         var rect = sec.getBoundingClientRect();
         var top = window.pageYOffset + rect.top - off - 8;
@@ -200,7 +261,29 @@
   }
 
   // ───────── Yarn cards rendering ─────────
+  function numLabelFor(tip) {
+    if (tip === "DENYE") return "Denye";
+    if (tip === "DTEX")  return "dtex";
+    if (tip === "NE")    return "Ne";
+    if (tip === "NM")    return "Nm";
+    return "Numara";
+  }
+
+  function placeholderFor(tip) {
+    if (tip === "DENYE" || tip === "DTEX") return "örn. 300 veya 300*2";
+    return "örn. 30 veya 30/2";
+  }
+
+  // Backfill `raw` from older saved records that only have denye+kat.
+  function ensureRaw(y) {
+    if (y.raw && String(y.raw).length) return;
+    if (y.denye) y.raw = yarnRawFromValues(y);
+  }
+
   function renderYarnCard(yarn, index, kind) {
+    ensureRaw(yarn);
+    syncYarnFromRaw(yarn);
+
     var card = document.createElement("div");
     card.className = "yarn-card";
     card.dataset.id = yarn.id;
@@ -218,15 +301,23 @@
       '  <button type="button" data-tip="NM">NM</button>' +
       '  <button type="button" data-tip="NE">NE</button>' +
       "</div>" +
+      '<div class="field-full">' +
+      '  <div class="label-row"><span data-num-label>Denye</span></div>' +
+      '  <input data-k="raw" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" />' +
+      "</div>" +
       '<div class="grid-2">' +
-      '  <label class="field"><div class="label-row"><span>Denye</span></div><input data-k="denye" type="number" inputmode="decimal" step="0.1" min="0" /></label>' +
-      '  <label class="field"><div class="label-row"><span>Kat</span></div><input data-k="kat" type="number" inputmode="decimal" step="1" min="1" /></label>' +
       '  <label class="field"><div class="label-row"><span>Tel</span></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" /></label>' +
       '  <label class="field"><div class="label-row"><span>Fiyat $/kg</span></div><input data-k="fiyat" type="number" inputmode="decimal" step="0.01" min="0" /></label>' +
       "</div>" +
-      '<div class="preview" data-preview>Gramaj: <strong>—</strong> g/mt · Tutar: <strong>—</strong> /mt</div>';
+      '<div class="preview" data-preview></div>';
 
-    // segmented
+    var rawInput = card.querySelector('input[data-k="raw"]');
+    var numLabelEl = card.querySelector("[data-num-label]");
+    rawInput.value = yarn.raw || "";
+    numLabelEl.textContent = numLabelFor(yarn.tip);
+    rawInput.placeholder = placeholderFor(yarn.tip);
+
+    // segmented (tip switch)
     var segBtns = $$(".segmented button", card);
     segBtns.forEach(function (b) {
       if (b.dataset.tip === yarn.tip) b.classList.add("active");
@@ -234,26 +325,36 @@
         yarn.tip = b.dataset.tip;
         segBtns.forEach(function (x) { x.classList.remove("active"); });
         b.classList.add("active");
+        numLabelEl.textContent = numLabelFor(yarn.tip);
+        rawInput.placeholder = placeholderFor(yarn.tip);
+        // Re-validate raw against new tip rules
         updateYarnState(card, yarn, kind);
       });
     });
 
-    // inputs
+    // raw input — smart parser
+    rawInput.addEventListener("input", function () {
+      yarn.raw = rawInput.value;
+      updateYarnState(card, yarn, kind);
+    });
+    rawInput.addEventListener("blur", function () {
+      var r = parseYarnInput(yarn.raw, yarn.tip);
+      if (yarn.raw && !r.valid) rawInput.classList.add("has-error");
+      else rawInput.classList.remove("has-error");
+    });
+
+    // tel + fiyat inputs
     $$("input[data-k]", card).forEach(function (inp) {
       var key = inp.dataset.k;
+      if (key === "raw") return;
       inp.value = yarn[key];
       inp.addEventListener("input", function () {
         yarn[key] = inp.value;
         updateYarnState(card, yarn, kind);
       });
       inp.addEventListener("blur", function () {
-        if (key === "kat") {
-          if (!isNonNeg(inp.value) || parseFloat(inp.value) < 1) inp.classList.add("has-error");
-          else inp.classList.remove("has-error");
-        } else {
-          if (!isPos(inp.value)) inp.classList.add("has-error");
-          else inp.classList.remove("has-error");
-        }
+        if (!isPos(inp.value)) inp.classList.add("has-error");
+        else inp.classList.remove("has-error");
       });
     });
 
@@ -275,6 +376,7 @@
   }
 
   function updateYarnState(card, yarn, kind) {
+    var parsed = syncYarnFromRaw(yarn);
     var ok = yarnValid(yarn);
     card.classList.toggle("valid", ok);
     card.classList.toggle("invalid", !ok);
@@ -283,6 +385,7 @@
 
     var pre = card.querySelector("[data-preview]");
     if (ok) {
+      pre.classList.remove("hint");
       var fak = kind === "cozgu" ? 1 : (parseFloat(state.fis.atkiSik) || 0) / 100;
       var t = window.Formulas.tukH(yarn.tip, yarn.denye, yarn.kat, yarn.tel, fak, window.FPD);
       if (kind === "atki") {
@@ -290,9 +393,21 @@
         if (en > 0) t = t * (en / 100);
       }
       var tutar = (t * (parseFloat(yarn.fiyat) || 0)) / 1000;
-      pre.innerHTML = "Gramaj: <strong>" + fmtNum(t) + "</strong> g/mt · Tutar: <strong>$" + fmtNum(tutar) + "</strong> /mt";
+      pre.innerHTML =
+        "Gramaj: <strong>" + fmtNum(t) + "</strong> g/mt · " +
+        "Tutar: <strong>$" + fmtNum(tutar) + "</strong> /mt · " +
+        "Kat: <strong>" + (yarn.kat || 1) + "</strong>";
     } else {
-      pre.innerHTML = "Gramaj: <strong>—</strong> g/mt · Tutar: <strong>—</strong> /mt";
+      pre.classList.add("hint");
+      var hint;
+      if (!yarn.raw) hint = numLabelFor(yarn.tip) + " girin (örn. " + (yarn.tip === "NE" || yarn.tip === "NM" ? "30/2" : "300*2") + ")";
+      else if (!parsed.valid) hint = parsed.badOp
+        ? (yarn.tip === "NE" || yarn.tip === "NM" ? "Ne/Nm için '/' kullanın" : "Denye/dtex için '*' kullanın")
+        : "Geçersiz " + numLabelFor(yarn.tip);
+      else if (!isPos(yarn.tel)) hint = "Tel girin";
+      else if (!isPos(yarn.fiyat)) hint = "Fiyat girin";
+      else hint = "Eksik bilgi";
+      pre.textContent = hint;
     }
     refreshNext();
   }
@@ -315,7 +430,7 @@
     $("brIscilik").textContent = fmtMoney(br.fasI);
     $("brTerbiye").textContent = fmtMoney(br.terbM);
     $("brFire").textContent = fmtMoney(br.fireM);
-    var ek = (parseFloat(state.fis.kursum) || 0) + (parseFloat(state.fis.ekMal) || 0) + (parseFloat(state.fis.kar) || 0);
+    var ek = (parseFloat(state.fis.kursum) || 0) + (parseFloat(state.fis.ekMal) || 0);
     $("brEk").textContent = fmtMoney(ek);
     $("brGrmt").textContent = fmtNum(br.grmt) + " g/mt";
     $("brUAy").textContent = fmtNum(br.uAy) + " mt/ay";
@@ -336,15 +451,29 @@
   }
 
   function saveCurrent() {
-    var defaultName = state.currentRecordName || "Hesap " + new Date().toLocaleDateString("tr-TR");
-    var name = window.prompt("Kayıt adı:", defaultName);
-    if (name === null) return;
-    name = name.trim();
-    if (!name) return;
-
     var br = window.Formulas.calcBreakdown(state.fis, state.iplikler, window.FPD);
     var list = loadRecords();
     var now = Date.now();
+    var name;
+    var isUpdate = false;
+
+    if (state.currentRecordId) {
+      // Silent update — keep existing id + name
+      var idx0 = list.findIndex(function (r) { return r.id === state.currentRecordId; });
+      if (idx0 >= 0) {
+        name = state.currentRecordName || list[idx0].name;
+        isUpdate = true;
+      }
+    }
+
+    if (!isUpdate) {
+      var defaultName = state.currentRecordName || "Hesap " + new Date().toLocaleDateString("tr-TR");
+      name = window.prompt("Kayıt adı:", defaultName);
+      if (name === null) return;
+      name = name.trim();
+      if (!name) return;
+    }
+
     var rec = {
       id: state.currentRecordId || ("r_" + now.toString(36) + Math.random().toString(36).slice(2, 5)),
       name: name,
@@ -365,7 +494,7 @@
     state.currentRecordId = rec.id;
     state.currentRecordName = rec.name;
     $("heroName").textContent = "» " + rec.name;
-    toast("Kaydedildi ✓");
+    toast(isUpdate ? "Güncellendi ✓" : "Kaydedildi ✓");
   }
 
   function loadIntoState(rec) {
@@ -574,13 +703,54 @@
   }
 
   // ───────── Boot ─────────
+  // ───────── Theme manager ─────────
+  var THEME_KEY = "armur.mobile.theme"; // "auto" | "light" | "dark"
+  function readTheme() {
+    try { return localStorage.getItem(THEME_KEY) || "auto"; } catch (e) { return "auto"; }
+  }
+  function writeTheme(v) {
+    try { localStorage.setItem(THEME_KEY, v); } catch (e) {}
+  }
+  function applyTheme(mode) {
+    var html = document.documentElement;
+    if (mode === "auto") html.removeAttribute("data-theme");
+    else html.setAttribute("data-theme", mode);
+    var ic = document.querySelector("[data-theme-icon]");
+    if (ic) ic.textContent = mode === "dark" ? "🌙" : (mode === "light" ? "☀️" : "🔆");
+  }
+  function cycleTheme() {
+    var order = ["auto", "light", "dark"];
+    var cur = readTheme();
+    var next = order[(order.indexOf(cur) + 1) % order.length];
+    writeTheme(next);
+    applyTheme(next);
+  }
+
+  // ───────── Accordion ─────────
+  function bindAccordion() {
+    $$("#pageMaliyet .step-heading").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var step = btn.closest(".step");
+        if (!step) return;
+        var open = !step.classList.toggle("collapsed");
+        btn.setAttribute("aria-expanded", String(open));
+      });
+    });
+  }
+
   function init() {
+    // Apply persisted theme as early as possible
+    applyTheme(readTheme());
+
     // Page tabs (delegated for robust touch handling)
     $("pageTabs").addEventListener("click", function (e) {
       var tab = e.target.closest(".page-tab");
       if (!tab) return;
       goPage(tab.dataset.page);
     });
+
+    // Theme toggle
+    $("themeToggle").addEventListener("click", cycleTheme);
 
     bindConverter();
 
@@ -596,11 +766,13 @@
     bindFisInput("genelFire", "genelFire", { fn: isNonNeg, msg: "0 veya üzeri" });
     bindFisInput("kursum", "kursum", { fn: isNonNeg, msg: "0 veya üzeri" });
     bindFisInput("ekMal", "ekMal", { fn: isNonNeg, msg: "0 veya üzeri" });
-    bindFisInput("kar", "kar", { fn: isNonNeg, msg: "0 veya üzeri" });
 
     // Yarn lists
     renderYarnList("cozgu");
     renderYarnList("atki");
+
+    // Accordion (after sections exist)
+    bindAccordion();
 
     $("addCozgu").addEventListener("click", function () {
       state.iplikler.cozgu.push(makeYarn());
