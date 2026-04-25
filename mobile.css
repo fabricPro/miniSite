@@ -30,6 +30,9 @@
 
 * { box-sizing: border-box; }
 
+/* HTML `hidden` attribute must always win over class display rules. */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -98,51 +101,60 @@ input, button { font-family: inherit; }
   align-items: center;
   justify-content: center;
   gap: 4px;
-  transition: background 0.15s, transform 0.1s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.10);
+  transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .btn-ghost:active {
   background: rgba(255, 255, 255, 0.32);
-  transform: scale(0.96);
+  transform: scale(0.94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 /* ───────── page tabs (top-level) ───────── */
 .page-tabs {
   display: inline-flex;
-  background: rgba(0, 0, 0, 0.20);
-  padding: 4px;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 5px;
   border-radius: 999px;
   gap: 2px;
   flex: 1;
   max-width: 280px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
 .page-tab {
   flex: 1;
   background: transparent;
   border: 0;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.78);
   font-weight: 600;
   font-size: 14px;
+  letter-spacing: 0.2px;
   padding: 0 14px;
   height: 38px;
   min-height: 38px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.12s;
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
 
 .page-tab:active {
+  transform: scale(0.97);
   background: rgba(255, 255, 255, 0.10);
 }
 
 .page-tab.active {
   background: #fff;
   color: var(--ac);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.10);
 }
 
 /* ───────── pages ───────── */
@@ -413,22 +425,24 @@ input, button { font-family: inherit; }
 
 .btn-add {
   width: 100%;
-  background: transparent;
-  border: 2px dashed var(--line);
+  background: color-mix(in srgb, var(--ac) 4%, transparent);
+  border: 2px dashed color-mix(in srgb, var(--ac) 35%, var(--line));
   color: var(--ac);
   padding: 14px;
   font-size: 15px;
   font-weight: 600;
+  letter-spacing: 0.2px;
   border-radius: 14px;
   min-height: 56px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  transition: border-color 0.18s, background 0.18s, transform 0.12s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .btn-add:active {
   border-color: var(--ac);
-  background: color-mix(in srgb, var(--ac) 8%, transparent);
+  border-style: solid;
+  background: color-mix(in srgb, var(--ac) 12%, transparent);
   transform: scale(0.99);
 }
 
@@ -455,19 +469,25 @@ input, button { font-family: inherit; }
 .bottombar[hidden] { display: none; }
 
 .btn-primary {
-  background: linear-gradient(180deg, var(--ac), var(--ac-dark));
+  position: relative;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--ac) 92%, white),
+    var(--ac-dark));
   color: #fff;
   border: 0;
-  height: 50px;
+  height: 52px;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 0 22px;
   border-radius: 14px;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.2px;
   cursor: pointer;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--ac) 38%, transparent);
-  transition: transform 0.1s, box-shadow 0.15s, opacity 0.15s;
+  box-shadow:
+    0 6px 18px color-mix(in srgb, var(--ac) 38%, transparent),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.18s ease, opacity 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -476,35 +496,40 @@ input, button { font-family: inherit; }
   color: var(--muted);
   cursor: not-allowed;
   box-shadow: none;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .btn-primary:not(:disabled):active {
-  transform: translateY(1px) scale(0.99);
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--ac) 30%, transparent);
+  transform: translateY(2px) scale(0.985);
+  box-shadow:
+    0 2px 6px color-mix(in srgb, var(--ac) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .btn-secondary {
   background: var(--card);
   color: var(--text);
   border: 1px solid var(--line);
-  height: 50px;
+  height: 52px;
   min-height: 44px;
-  padding: 0 18px;
+  padding: 0 22px;
   border-radius: 14px;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.2px;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: background 0.15s, transform 0.12s ease, border-color 0.15s, box-shadow 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .btn-secondary:active {
   background: var(--bg);
   border-color: var(--ac);
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(2px) scale(0.985);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac) 14%, transparent);
 }
 
 /* ───────── result step ───────── */
