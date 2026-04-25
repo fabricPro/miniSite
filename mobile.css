@@ -30,9 +30,6 @@
 
 * { box-sizing: border-box; }
 
-/* HTML `hidden` attribute must always win over class display rules. */
-[hidden] { display: none !important; }
-
 html, body {
   margin: 0;
   padding: 0;
