@@ -304,7 +304,6 @@
       '<div class="field-full">' +
       '  <div class="label-row"><span data-num-label>Denye</span></div>' +
       '  <input data-k="raw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" />' +
-      '  <div class="kat-chips" data-kat-chips></div>' +
       "</div>" +
       '<div class="grid-2">' +
       '  <label class="field"><div class="label-row"><span>Tel</span></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" /></label>' +
@@ -335,7 +334,6 @@
           yarn.raw = prev.num + op2 + prev.kat;
           rawInput.value = yarn.raw;
         }
-        renderKatChips();
         updateYarnState(card, yarn, kind);
       });
     });
@@ -343,7 +341,6 @@
     // raw input — smart parser
     rawInput.addEventListener("input", function () {
       yarn.raw = rawInput.value;
-      renderKatChips();
       updateYarnState(card, yarn, kind);
     });
     rawInput.addEventListener("blur", function () {
@@ -366,37 +363,6 @@
         else inp.classList.remove("has-error");
       });
     });
-
-    // kat chips — quick-insert ×N or /N suffix without typing operator
-    var katChipsEl = card.querySelector("[data-kat-chips]");
-    function renderKatChips() {
-      var op = (yarn.tip === "NE" || yarn.tip === "NM") ? "/" : "*";
-      var sym = op === "/" ? "÷" : "×";
-      var parsed = parseYarnInput(yarn.raw, yarn.tip);
-      var currentKat = parsed.valid ? parsed.kat : 1;
-      var values = [1, 2, 3, 4, 5];
-      var chips = values.map(function (v) {
-        var label = v === 1 ? "Tek" : (sym + v);
-        var active = v === currentKat ? " active" : "";
-        return '<button type="button" class="kat-chip' + active + '" data-kat="' + v + '">' + label + "</button>";
-      }).join("");
-      katChipsEl.innerHTML = '<span class="kat-chips-label">Kat:</span>' + chips;
-    }
-    katChipsEl.addEventListener("click", function (e) {
-      var btn = e.target.closest(".kat-chip");
-      if (!btn) return;
-      var k = parseInt(btn.dataset.kat, 10);
-      var op = (yarn.tip === "NE" || yarn.tip === "NM") ? "/" : "*";
-      // Take base number from current raw (or empty if invalid base)
-      var s = String(yarn.raw || "").replace(/\s+/g, "").replace(",", ".");
-      var baseMatch = /^(\d+(?:\.\d+)?)(?:[*/]\d+(?:\.\d+)?)?$/.exec(s);
-      var base = baseMatch ? baseMatch[1] : "";
-      yarn.raw = base ? (k === 1 ? base : base + op + k) : (k === 1 ? "" : op + k);
-      rawInput.value = yarn.raw;
-      renderKatChips();
-      updateYarnState(card, yarn, kind);
-    });
-    renderKatChips();
 
     // delete
     var del = card.querySelector(".yarn-del");
