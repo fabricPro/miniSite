@@ -208,7 +208,38 @@ input, button { font-family: inherit; }
 /* ───────── content ───────── */
 .content { padding: 14px; }
 
-.step { display: block; }
+.step {
+  display: block;
+  scroll-margin-top: 110px;
+  margin-bottom: 22px;
+}
+.step:last-child { margin-bottom: 0; }
+
+.step-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 4px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ac);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--ac) 40%, transparent);
+}
 
 .card {
   background: var(--card);

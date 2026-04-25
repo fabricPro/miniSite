@@ -131,32 +131,40 @@
       b.setAttribute("aria-selected", String(on));
     });
     if (name === "maliyet") {
-      goStep(state.step);
+      goStep(state.step, { scroll: false });
+      window.scrollTo(0, 0);
     } else {
       $("bottomNav").hidden = true;
+      window.scrollTo(0, 0);
     }
-    window.scrollTo(0, 0);
   }
 
-  // ───────── Step navigation ─────────
-  function goStep(n) {
+  // ───────── Step navigation (scroll-based; all steps visible) ─────────
+  function goStep(n, opts) {
+    opts = opts || {};
     if (n < 1) n = 1;
     if (n > TOTAL_STEPS) n = TOTAL_STEPS;
     state.step = n;
-    $$("#pageMaliyet section.step").forEach(function (sec) {
-      sec.hidden = parseInt(sec.dataset.step, 10) !== n;
-    });
     $("stepChip").textContent = n + "/" + TOTAL_STEPS;
     $("stepTitle").textContent = STEP_TITLES[n];
     $("progressBar").style.width = (n / TOTAL_STEPS) * 100 + "%";
 
-    $("bottomNav").hidden = state.page !== "maliyet" || n === TOTAL_STEPS;
-
+    $("bottomNav").hidden = state.page !== "maliyet";
     $("prevBtn").disabled = n === 1;
     refreshNext();
 
-    if (n === 5) renderResult();
-    window.scrollTo(0, 0);
+    renderResult();
+
+    if (opts.scroll !== false) {
+      var sec = document.querySelector('#pageMaliyet section.step[data-step="' + n + '"]');
+      if (sec) {
+        var topbar = $("topbar") || document.querySelector(".topbar");
+        var off = topbar ? topbar.offsetHeight : 0;
+        var rect = sec.getBoundingClientRect();
+        var top = window.pageYOffset + rect.top - off - 8;
+        window.scrollTo({ top: top, behavior: "smooth" });
+      }
+    }
   }
 
   function refreshNext() {
@@ -612,6 +620,14 @@
       goStep(state.step + 1);
     });
 
+    // Live-recompute result on any maliyet input change
+    $("pageMaliyet").addEventListener("input", function () { renderResult(); });
+    $("pageMaliyet").addEventListener("click", function (e) {
+      if (e.target.closest(".segmented button") || e.target.closest(".yarn-del")) {
+        setTimeout(renderResult, 0);
+      }
+    });
+
     // Result actions
     $("newCalc").addEventListener("click", function () {
       if (!window.confirm("Yeni hesaba başlamak için mevcut girişler temizlensin mi?")) return;
@@ -628,7 +644,7 @@
     $("sheetMask").addEventListener("click", closeSheet);
 
     bindTooltips();
-    goStep(1);
+    goStep(1, { scroll: false });
     goPage("converter");
   }
 
