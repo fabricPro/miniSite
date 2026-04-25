@@ -1,4 +1,4 @@
-const CACHE = "armur-v12";
+const CACHE = "armur-v13";
 const SHELL = [
   "./",
   "./index.html",

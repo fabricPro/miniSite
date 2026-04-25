@@ -459,6 +459,39 @@ input, button { font-family: inherit; }
   min-width: 0;
 }
 
+.kat-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.kat-chip {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 0 12px;
+  height: 32px;
+  min-width: 44px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.kat-chip:active {
+  transform: scale(0.94);
+}
+
+.kat-chip.active {
+  background: var(--ac);
+  color: #fff;
+  border-color: var(--ac);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--ac) 35%, transparent);
+}
+
 .yarn-card .yarn-title {
   font-weight: 600;
   font-size: 14px;
