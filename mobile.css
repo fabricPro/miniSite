@@ -463,22 +463,36 @@ input, button { font-family: inherit; }
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 2px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--ac) 6%, var(--bg));
+  border: 1px dashed color-mix(in srgb, var(--ac) 28%, transparent);
+  border-radius: 10px;
+}
+
+.kat-chips-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-right: 4px;
 }
 
 .kat-chip {
-  background: var(--bg);
-  color: var(--muted);
+  background: var(--card);
+  color: var(--text);
   border: 1px solid var(--line);
-  padding: 0 12px;
-  height: 32px;
-  min-width: 44px;
+  padding: 0 14px;
+  height: 36px;
+  min-width: 48px;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
 
 .kat-chip:active {
@@ -489,7 +503,7 @@ input, button { font-family: inherit; }
   background: var(--ac);
   color: #fff;
   border-color: var(--ac);
-  box-shadow: 0 1px 4px color-mix(in srgb, var(--ac) 35%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--ac) 38%, transparent);
 }
 
 .yarn-card .yarn-title {

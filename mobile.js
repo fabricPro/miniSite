@@ -375,11 +375,12 @@
       var parsed = parseYarnInput(yarn.raw, yarn.tip);
       var currentKat = parsed.valid ? parsed.kat : 1;
       var values = [1, 2, 3, 4, 5];
-      katChipsEl.innerHTML = values.map(function (v) {
+      var chips = values.map(function (v) {
         var label = v === 1 ? "Tek" : (sym + v);
         var active = v === currentKat ? " active" : "";
         return '<button type="button" class="kat-chip' + active + '" data-kat="' + v + '">' + label + "</button>";
       }).join("");
+      katChipsEl.innerHTML = '<span class="kat-chips-label">Kat:</span>' + chips;
     }
     katChipsEl.addEventListener("click", function (e) {
       var btn = e.target.closest(".kat-chip");
