@@ -1,4 +1,4 @@
-const CACHE = "armur-v15";
+const CACHE = "armur-v16";
 const SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const SHELL = [
   "./constants.js",
   "./mobile-icon.png",
   "./mobile-icon.svg",
+  "./mobile-splash.png",
   "./mobile-manifest.webmanifest",
 ];
 

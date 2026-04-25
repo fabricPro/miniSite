@@ -69,6 +69,23 @@
 /* HTML `hidden` attribute must always win over class display rules. */
 [hidden] { display: none !important; }
 
+/* ───────── Splash overlay ───────── */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0d1322 url("./mobile-splash.png") center / cover no-repeat;
+  pointer-events: none;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+body.splash-done #splash {
+  opacity: 0;
+  visibility: hidden;
+}
+
 html, body {
   margin: 0;
   padding: 0;

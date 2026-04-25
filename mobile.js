@@ -858,6 +858,15 @@
     bindTooltips();
     goStep(1, { scroll: false });
     goPage("converter");
+
+    // Hide splash after a brief minimum display time (so it's seen, not flashed)
+    var splashStarted = window._splashStartedAt || (window._splashStartedAt = Date.now());
+    var minMs = 700;
+    var elapsed = Date.now() - splashStarted;
+    var wait = Math.max(0, minMs - elapsed);
+    setTimeout(function () {
+      document.body.classList.add("splash-done");
+    }, wait);
   }
 
   // SW register
