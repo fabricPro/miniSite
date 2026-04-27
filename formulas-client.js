@@ -45,10 +45,34 @@
     var aSik = num(fis.atkiSik);
     var tarakEn = num(fis.tarakEn);
     var atkiArr = iplikler.atki || [];
+
+    // Sum of "pay" (ratio) for atki yarns; default 1 each.
+    var totalPay = 0;
+    for (var p = 0; p < atkiArr.length; p++) {
+      var pv = num(atkiArr[p].pay);
+      totalPay += (pv > 0 ? pv : 1);
+    }
+    if (totalPay <= 0) totalPay = 1;
+
     for (var j = 0; j < atkiArr.length; j++) {
       var a = atkiArr[j];
-      var tBase = tukH(a.tip, a.denye, a.kat, a.tel, aSik / 100, fp);
-      var tA = tarakEn > 0 ? tBase * (tarakEn / 100) : tBase;
+      var pay = num(a.pay);
+      if (pay <= 0) pay = 1;
+      var share = pay / totalPay;
+      var den = num(a.denye);
+      var kat = num(a.kat) || 1;
+
+      // length of THIS yarn per metre of fabric (in metres):
+      //   = atkı/cm × cm × share = atkıSık × tarakEn × share (m of yarn / m of fabric)
+      var tA = 0;
+      if (aSik > 0 && tarakEn > 0 && den > 0) {
+        var lenM = aSik * tarakEn * share;
+        if (a.tip === "DENYE")      tA = lenM * den * kat / fp.denye_base;
+        else if (a.tip === "DTEX")  tA = lenM * den * kat / fp.dtex_base;
+        else if (a.tip === "NM")    tA = lenM * kat / den;
+        else if (a.tip === "NE")    tA = lenM * kat / (fp.ne_factor * den);
+      }
+
       var costA = tA * num(a.fiyat) / 1000;
       topI += costA;
       grmt += tA;

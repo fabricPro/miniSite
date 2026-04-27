@@ -54,7 +54,8 @@
       tip: "DENYE",
       // raw is the user-typed text (e.g. "300", "300*2", "30/2")
       raw: "",
-      tel: "",
+      tel: "",   // used for cozgu (number of threads)
+      pay: "1",  // used for atki (ratio in repeat; defaults to 1)
       fiyat: "",
     };
   }
@@ -149,9 +150,16 @@
     return den + op + k;
   }
 
-  function yarnValid(y) {
+  function yarnValid(y, kind) {
     var r = parseYarnInput(y.raw, y.tip);
-    return r.valid && isPos(y.tel) && isPos(y.fiyat);
+    if (!r.valid || !isPos(y.fiyat)) return false;
+    if (kind === "atki") {
+      // pay optional; empty defaults to 1. Reject only if explicitly <= 0.
+      if (y.pay === undefined || y.pay === null || y.pay === "") return true;
+      var p = parseFloat(y.pay);
+      return Number.isFinite(p) && p > 0;
+    }
+    return isPos(y.tel);
   }
 
   function stepValid(step) {
@@ -159,10 +167,12 @@
       return isPos(state.fis.tarakEn) && isPos(state.fis.cozguSik) && isPos(state.fis.atkiSik);
     }
     if (step === 2) {
-      return state.iplikler.cozgu.length > 0 && state.iplikler.cozgu.every(yarnValid);
+      return state.iplikler.cozgu.length > 0 &&
+        state.iplikler.cozgu.every(function (y) { return yarnValid(y, "cozgu"); });
     }
     if (step === 3) {
-      return state.iplikler.atki.length > 0 && state.iplikler.atki.every(yarnValid);
+      return state.iplikler.atki.length > 0 &&
+        state.iplikler.atki.every(function (y) { return yarnValid(y, "atki"); });
     }
     if (step === 4) {
       var f = state.fis;
@@ -306,7 +316,9 @@
       '  <input data-k="raw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" />' +
       "</div>" +
       '<div class="grid-2">' +
-      '  <label class="field"><div class="label-row"><span>Tel</span></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" /></label>' +
+      (kind === "atki"
+        ? '  <label class="field"><div class="label-row"><span>Pay <small>(oran)</small></span></div><input data-k="pay" type="number" inputmode="decimal" step="0.5" min="0" placeholder="1" /></label>'
+        : '  <label class="field"><div class="label-row"><span>Tel</span></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" /></label>') +
       '  <label class="field"><div class="label-row"><span>Fiyat $/kg</span></div><input data-k="fiyat" type="number" inputmode="decimal" step="0.01" min="0" /></label>' +
       "</div>" +
       '<div class="preview" data-preview></div>';
@@ -381,9 +393,44 @@
     return card;
   }
 
+  // Compute share for an atki yarn (pay / sum of pays in the atki array).
+  function atkiShare(yarn) {
+    var arr = state.iplikler.atki || [];
+    var totalPay = 0;
+    for (var i = 0; i < arr.length; i++) {
+      var pv = parseFloat(arr[i].pay);
+      totalPay += (Number.isFinite(pv) && pv > 0) ? pv : 1;
+    }
+    if (totalPay <= 0) totalPay = 1;
+    var p = parseFloat(yarn.pay);
+    if (!Number.isFinite(p) || p <= 0) p = 1;
+    return p / totalPay;
+  }
+
+  function computeYarnGramaj(yarn, kind) {
+    var den = parseFloat(yarn.denye) || 0;
+    var kat = parseFloat(yarn.kat) || 1;
+    if (den <= 0) return 0;
+    if (kind === "cozgu") {
+      var tel = parseFloat(yarn.tel) || 0;
+      return window.Formulas.tukH(yarn.tip, den, kat, tel, 1, window.FPD);
+    }
+    // atki — classic textile formula
+    var aSik = parseFloat(state.fis.atkiSik) || 0;
+    var tarakEn = parseFloat(state.fis.tarakEn) || 0;
+    if (aSik <= 0 || tarakEn <= 0) return 0;
+    var lenM = aSik * tarakEn * atkiShare(yarn);
+    var fp = window.FPD;
+    if (yarn.tip === "DENYE") return lenM * den * kat / fp.denye_base;
+    if (yarn.tip === "DTEX")  return lenM * den * kat / fp.dtex_base;
+    if (yarn.tip === "NM")    return lenM * kat / den;
+    if (yarn.tip === "NE")    return lenM * kat / (fp.ne_factor * den);
+    return 0;
+  }
+
   function updateYarnState(card, yarn, kind) {
     var parsed = syncYarnFromRaw(yarn);
-    var ok = yarnValid(yarn);
+    var ok = yarnValid(yarn, kind);
     card.classList.toggle("valid", ok);
     card.classList.toggle("invalid", !ok);
     var badge = card.querySelector("[data-badge]");
@@ -392,12 +439,7 @@
     var pre = card.querySelector("[data-preview]");
     if (ok) {
       pre.classList.remove("hint");
-      var fak = kind === "cozgu" ? 1 : (parseFloat(state.fis.atkiSik) || 0) / 100;
-      var t = window.Formulas.tukH(yarn.tip, yarn.denye, yarn.kat, yarn.tel, fak, window.FPD);
-      if (kind === "atki") {
-        var en = parseFloat(state.fis.tarakEn);
-        if (en > 0) t = t * (en / 100);
-      }
+      var t = computeYarnGramaj(yarn, kind);
       var tutar = (t * (parseFloat(yarn.fiyat) || 0)) / 1000;
       pre.innerHTML =
         "Gramaj: <strong>" + fmtNum(t) + "</strong> g/mt · " +
@@ -410,7 +452,7 @@
       else if (!parsed.valid) hint = parsed.badOp
         ? (yarn.tip === "NE" || yarn.tip === "NM" ? "Ne/Nm için '/' kullanın" : "Denye/dtex için '*' kullanın")
         : "Geçersiz " + numLabelFor(yarn.tip);
-      else if (!isPos(yarn.tel)) hint = "Tel girin";
+      else if (kind === "cozgu" && !isPos(yarn.tel)) hint = "Tel girin";
       else if (!isPos(yarn.fiyat)) hint = "Fiyat girin";
       else hint = "Eksik bilgi";
       pre.textContent = hint;
@@ -423,6 +465,17 @@
     wrap.innerHTML = "";
     state.iplikler[kind].forEach(function (y, i) {
       wrap.appendChild(renderYarnCard(y, i, kind));
+    });
+  }
+
+  function refreshAllYarnPreviews() {
+    ["cozgu", "atki"].forEach(function (kind) {
+      var wrap = $(kind === "cozgu" ? "cozguList" : "atkiList");
+      if (!wrap) return;
+      state.iplikler[kind].forEach(function (yarn) {
+        var card = wrap.querySelector('[data-id="' + yarn.id + '"]');
+        if (card) updateYarnState(card, yarn, kind);
+      });
     });
   }
 
@@ -798,11 +851,15 @@
       goStep(state.step + 1);
     });
 
-    // Live-recompute result on any maliyet input change
-    $("pageMaliyet").addEventListener("input", function () { renderResult(); });
+    // Live-recompute result + all yarn previews on any maliyet input change
+    // (atkı share depends on pay sums; preview depends on tarakEn/atkıSık).
+    $("pageMaliyet").addEventListener("input", function () {
+      refreshAllYarnPreviews();
+      renderResult();
+    });
     $("pageMaliyet").addEventListener("click", function (e) {
       if (e.target.closest(".segmented button") || e.target.closest(".yarn-del")) {
-        setTimeout(renderResult, 0);
+        setTimeout(function () { refreshAllYarnPreviews(); renderResult(); }, 0);
       }
     });
 
