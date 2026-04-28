@@ -3,63 +3,253 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#6750A4" />
+  <meta name="theme-color" content="#B45309" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Mini Todo</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Armür Maliyet</title>
+  <link rel="manifest" href="./mobile-manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./mobile-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="./mobile-icon.svg" />
+  <link rel="apple-touch-icon" sizes="192x192" href="./mobile-icon.png" />
+  <link rel="apple-touch-startup-image" href="./mobile-splash.png" />
+  <link rel="stylesheet" href="./mobile.css" />
 </head>
 <body>
+  <div id="splash" aria-hidden="true"></div>
   <div class="app">
-    <header class="app-bar">
-      <h1>Mini Todo</h1>
-      <button id="clearDone" class="icon-btn" title="Tamamlananlari temizle" aria-label="Tamamlananlari temizle">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-          <path fill="currentColor" d="M9 3v1H4v2h1l1 14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-14h1V4h-5V3H9zm2 5h2v10h-2V8zm-4 0h2v10H7V8zm8 0h2v10h-2V8z"/>
-        </svg>
-      </button>
+    <header class="topbar">
+      <div class="topbar-row">
+        <div id="pageTabs" class="page-tabs" role="tablist">
+          <button type="button" class="page-tab active" data-page="converter" role="tab" aria-selected="true">Çevirici</button>
+          <button type="button" class="page-tab" data-page="maliyet" role="tab" aria-selected="false">Maliyet</button>
+        </div>
+        <button id="themeToggle" class="btn-ghost" type="button" aria-label="Tema">
+          <span data-theme-icon aria-hidden="true">🔆</span>
+        </button>
+        <button id="openRecords" class="btn-ghost" type="button" aria-label="Kayıtlar" hidden>
+          <span aria-hidden="true">📁</span>
+        </button>
+      </div>
+      <div id="wizardSub" hidden>
+        <div class="topbar-row sub">
+          <span id="stepChip" class="chip">1/5</span>
+          <span id="stepTitle" class="step-title">Kumaş ölçüleri</span>
+        </div>
+        <div class="progress" aria-hidden="true">
+          <div id="progressBar" class="progress-bar" style="width:20%"></div>
+        </div>
+      </div>
     </header>
 
-    <section class="stats" id="stats" aria-live="polite">
-      <span id="countText">0 gorev</span>
-      <div class="filters" role="tablist">
-        <button class="chip active" data-filter="all" role="tab" aria-selected="true">Tumu</button>
-        <button class="chip" data-filter="active" role="tab" aria-selected="false">Aktif</button>
-        <button class="chip" data-filter="done" role="tab" aria-selected="false">Bitti</button>
-      </div>
-    </section>
+    <main class="content">
+      <!-- ───────── PAGE: Çevirici ───────── -->
+      <section id="pageConverter" class="page">
+        <div class="card">
+          <h2 class="card-title">Numune</h2>
+          <div class="grid-2">
+            <label class="field">
+              <div class="label-row"><span>Gramaj (g)</span></div>
+              <input id="convWeight" type="number" inputmode="decimal" step="0.001" min="0" placeholder="0.000" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>Uzunluk (cm)</span></div>
+              <input id="convLength" type="number" inputmode="decimal" step="0.1" min="0" placeholder="0" autocomplete="off" />
+            </label>
+          </div>
+        </div>
 
-    <main class="list-wrap">
-      <ul id="todoList" class="todo-list" aria-label="Gorev listesi"></ul>
-      <div id="empty" class="empty">
-        <div class="empty-emoji" aria-hidden="true">+</div>
-        <p>Henuz gorev yok.<br/>Alttan yeni bir gorev ekle.</p>
-      </div>
+        <div class="card">
+          <h2 class="card-title">Numara</h2>
+          <div class="grid-2">
+            <label class="field">
+              <div class="label-row"><span>Ne <small>(pamuk)</small></span></div>
+              <input id="convNe" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>Nm <small>(metrik)</small></span></div>
+              <input id="convNm" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>Denye</span></div>
+              <input id="convDen" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+            <label class="field">
+              <div class="label-row"><span>dtex</span></div>
+              <input id="convDtex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" autocomplete="off" />
+            </label>
+          </div>
+        </div>
+
+        <button id="convClear" class="btn-secondary" type="button">Temizle</button>
+        <p class="hint">Gramaj + uzunluk girersen 4 numara hesaplanır. Numara alanlarından birine yazarsan diğer 3 numara güncellenir.</p>
+      </section>
+
+      <!-- ───────── PAGE: Maliyet (5-step wizard) ───────── -->
+      <section id="pageMaliyet" class="page" hidden>
+      <!-- ADIM 1 — Kumaş ölçüleri -->
+      <section class="step" data-step="1">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">1</span><span class="step-heading-text">Kumaş ölçüleri</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div class="card">
+          <label class="field">
+            <div class="label-row">
+              <span>Tarak Eni (cm)</span>
+              <button type="button" class="info" data-tip="Tarakta toplam çözgü genişliği. > 0 olmalı.">ⓘ</button>
+            </div>
+            <input id="tarakEn" type="number" inputmode="decimal" step="0.1" min="0" placeholder="örn. 180" />
+            <small class="err" data-err="tarakEn"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Çözgü Sıklığı (tel/cm)</span>
+              <button type="button" class="info" data-tip="1 cm'de düşen çözgü teli sayısı. > 0 olmalı.">ⓘ</button>
+            </div>
+            <input id="cozguSik" type="number" inputmode="decimal" step="0.1" min="0" placeholder="örn. 24" />
+            <small class="err" data-err="cozguSik"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Atkı Sıklığı (tel/cm)</span>
+              <button type="button" class="info" data-tip="1 cm'de atılan atkı sayısı. > 0 olmalı (işçilik formülü için kritik).">ⓘ</button>
+            </div>
+            <input id="atkiSik" type="number" inputmode="decimal" step="0.1" min="0" placeholder="örn. 22" />
+            <small class="err" data-err="atkiSik"></small>
+          </label>
+        </div>
+      </section>
+
+      <!-- ADIM 2 — Çözgü iplikleri -->
+      <section class="step" data-step="2">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">2</span><span class="step-heading-text">Çözgü iplikleri</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div id="cozguList" class="yarn-list"></div>
+        <button id="addCozgu" class="btn-add" type="button">+ Çözgü ipliği ekle</button>
+      </section>
+
+      <!-- ADIM 3 — Atkı iplikleri -->
+      <section class="step" data-step="3">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">3</span><span class="step-heading-text">Atkı iplikleri</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div id="atkiList" class="yarn-list"></div>
+        <button id="addAtki" class="btn-add" type="button">+ Atkı ipliği ekle</button>
+      </section>
+
+      <!-- ADIM 4 — Üretim & finisaj -->
+      <section class="step" data-step="4">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">4</span><span class="step-heading-text">Üretim & finisaj</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div class="card">
+          <label class="field">
+            <div class="label-row">
+              <span>Devir (atış/dk)</span>
+              <button type="button" class="info" data-tip="Tezgâh devri. Kapasite hesabında kullanılır.">ⓘ</button>
+            </div>
+            <input id="devir" type="number" inputmode="decimal" step="1" min="0" placeholder="360" />
+            <small class="err" data-err="devir"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Randıman (%)</span>
+              <button type="button" class="info" data-tip="Tezgâh verimliliği yüzdesi. Tipik 80–90.">ⓘ</button>
+            </div>
+            <input id="randiman" type="number" inputmode="decimal" step="0.1" min="0" placeholder="85" />
+            <small class="err" data-err="randiman"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Terbiye Fiyatı ($/kg)</span>
+              <button type="button" class="info" data-tip="Terbiye/finisaj birim fiyatı (kg başına). Yoksa 0.">ⓘ</button>
+            </div>
+            <input id="terbiyeFiyat" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" />
+            <small class="err" data-err="terbiyeFiyat"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Genel Fire (%)</span>
+              <button type="button" class="info" data-tip="İplik+işçilik+terbiye toplamı üzerinden % fire payı.">ⓘ</button>
+            </div>
+            <input id="genelFire" type="number" inputmode="decimal" step="0.1" min="0" placeholder="2" />
+            <small class="err" data-err="genelFire"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Kurşum ($/mt)</span>
+              <button type="button" class="info" data-tip="Sabit ek kurşum maliyeti. Yoksa 0.">ⓘ</button>
+            </div>
+            <input id="kursum" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" />
+            <small class="err" data-err="kursum"></small>
+          </label>
+
+          <label class="field">
+            <div class="label-row">
+              <span>Ek Malzeme ($/mt) <small>(opsiyonel)</small></span>
+              <button type="button" class="info" data-tip="Ek malzeme/kimyasal vb. birim fiyatı. Yoksa 0.">ⓘ</button>
+            </div>
+            <input id="ekMal" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0" />
+            <small class="err" data-err="ekMal"></small>
+          </label>
+        </div>
+      </section>
+
+      <!-- ADIM 5 — Sonuç -->
+      <section class="step" data-step="5">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">5</span><span class="step-heading-text">Sonuç</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div class="hero-card">
+          <div class="hero-label">TOPLAM</div>
+          <div id="heroTotal" class="hero-total">$0,00 /mt</div>
+          <div id="heroName" class="hero-sub"></div>
+        </div>
+
+        <div class="card breakdown">
+          <h3 class="card-title">Kırılım</h3>
+          <div class="row"><span>İplik</span><span id="brIplik">$0,00</span></div>
+          <div class="row"><span>İşçilik</span><span id="brIscilik">$0,00</span></div>
+          <div class="row"><span>Terbiye</span><span id="brTerbiye">$0,00</span></div>
+          <div class="row"><span>Fire</span><span id="brFire">$0,00</span></div>
+          <div class="row"><span>Kurşum + Ek</span><span id="brEk">$0,00</span></div>
+          <hr />
+          <div class="row"><span>Gramaj</span><span id="brGrmt">0,00 g/mt</span></div>
+          <div class="row"><span>Aylık kapasite</span><span id="brUAy">0,00 mt/ay</span></div>
+          <div class="row total"><span>TOPLAM</span><span id="brTotal">$0,00 /mt</span></div>
+        </div>
+
+        <div class="result-actions">
+          <button id="newCalc" class="btn-secondary" type="button">Yeni hesap</button>
+          <button id="saveCalc" class="btn-primary" type="button">Kaydet</button>
+          <button id="openRecords2" class="btn-secondary" type="button">📁 Kayıtlar</button>
+        </div>
+      </section>
+      </section><!-- /#pageMaliyet -->
     </main>
 
-    <form id="addForm" class="add-bar" autocomplete="off">
-      <input
-        id="newTodo"
-        type="text"
-        name="todo"
-        placeholder="Yeni gorev..."
-        enterkeyhint="done"
-        maxlength="140"
-        required
-      />
-      <button id="addBtn" type="submit" class="fab" aria-label="Ekle">
-        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-          <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/>
-        </svg>
-      </button>
-    </form>
+    <nav id="bottomNav" class="bottombar" hidden>
+      <button id="prevBtn" class="btn-secondary" type="button">Geri</button>
+      <button id="nextBtn" class="btn-primary" type="button" disabled>İleri</button>
+    </nav>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Records bottom-sheet -->
+  <div id="sheetMask" class="sheet-mask" hidden></div>
+  <div id="recordsSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="recordsTitle" hidden>
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <h2 id="recordsTitle">Kayıtlar</h2>
+      <button id="closeSheet" class="btn-ghost" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div id="recordsList" class="records-list"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden></div>
+
+  <!-- Tooltip popup -->
+  <div id="tipPop" class="tip-pop" hidden></div>
+
+  <script src="./constants.js"></script>
+  <script src="./formulas-client.js"></script>
+  <script src="./mobile.js"></script>
 </body>
 </html>
