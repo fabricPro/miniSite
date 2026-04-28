@@ -46,27 +46,19 @@
     var tarakEn = num(fis.tarakEn);
     var atkiArr = iplikler.atki || [];
 
-    // Sum of "pay" (ratio) for atki yarns; default 1 each.
-    var totalPay = 0;
-    for (var p = 0; p < atkiArr.length; p++) {
-      var pv = num(atkiArr[p].pay);
-      totalPay += (pv > 0 ? pv : 1);
-    }
-    if (totalPay <= 0) totalPay = 1;
-
     for (var j = 0; j < atkiArr.length; j++) {
       var a = atkiArr[j];
-      var pay = num(a.pay);
-      if (pay <= 0) pay = 1;
-      var share = pay / totalPay;
       var den = num(a.denye);
       var kat = num(a.kat) || 1;
+      var tel = num(a.tel);
 
-      // length of THIS yarn per metre of fabric (in metres):
-      //   = atkı/cm × cm × share = atkıSık × tarakEn × share (m of yarn / m of fabric)
+      // tel = total atkı thread count per metre of fabric
+      // (e.g. atkıSık 40 tel/cm × 100 cm = 4000 tel/mt for full single-yarn coverage).
+      // Each atkı thread length = tarakEn cm = tarakEn/100 m.
+      // Total length per mt of fabric (m) = tel × tarakEn / 100.
       var tA = 0;
-      if (aSik > 0 && tarakEn > 0 && den > 0) {
-        var lenM = aSik * tarakEn * share;
+      if (tel > 0 && tarakEn > 0 && den > 0) {
+        var lenM = tel * tarakEn / 100;
         if (a.tip === "DENYE")      tA = lenM * den * kat / fp.denye_base;
         else if (a.tip === "DTEX")  tA = lenM * den * kat / fp.dtex_base;
         else if (a.tip === "NM")    tA = lenM * kat / den;

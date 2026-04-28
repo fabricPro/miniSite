@@ -54,8 +54,10 @@
       tip: "DENYE",
       // raw is the user-typed text (e.g. "300", "300*2", "30/2")
       raw: "",
-      tel: "",   // used for cozgu (number of threads)
-      pay: "1",  // used for atki (ratio in repeat; defaults to 1)
+      // tel = thread count of THIS yarn:
+      //   cozgu: across the warp width (e.g. cozguSik × tarakEn for full coverage)
+      //   atki:  per metre of fabric length (e.g. atkıSik × 100 for full coverage)
+      tel: "",
       fiyat: "",
     };
   }
@@ -153,12 +155,6 @@
   function yarnValid(y, kind) {
     var r = parseYarnInput(y.raw, y.tip);
     if (!r.valid || !isPos(y.fiyat)) return false;
-    if (kind === "atki") {
-      // pay optional; empty defaults to 1. Reject only if explicitly <= 0.
-      if (y.pay === undefined || y.pay === null || y.pay === "") return true;
-      var p = parseFloat(y.pay);
-      return Number.isFinite(p) && p > 0;
-    }
     return isPos(y.tel);
   }
 
@@ -317,7 +313,7 @@
       "</div>" +
       '<div class="grid-2">' +
       (kind === "atki"
-        ? '  <label class="field"><div class="label-row"><span>Tel adedi</span><button type="button" class="info" data-tip="Raport (desen) içindeki tel sayısı. Tek tip atkı için 1 bırakın. 2-1 raportta 2 ve 1 yazın.">ⓘ</button></div><input data-k="pay" type="number" inputmode="decimal" step="1" min="0" placeholder="1" /></label>'
+        ? '  <label class="field"><div class="label-row"><span>Tel adedi</span><button type="button" class="info" data-tip="1 metre kumaştaki toplam atkı tel sayısı. Tek tip atkı için: AtkıSık × 100 (örn. 40 sıklık → 4000). Birden fazla atkı varsa toplamı bunlara bölün.">ⓘ</button></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" placeholder="örn. 4000" /></label>'
         : '  <label class="field"><div class="label-row"><span>Tel</span></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" /></label>') +
       '  <label class="field"><div class="label-row"><span>Fiyat $/kg</span></div><input data-k="fiyat" type="number" inputmode="decimal" step="0.01" min="0" /></label>' +
       "</div>" +
@@ -393,33 +389,18 @@
     return card;
   }
 
-  // Compute share for an atki yarn (pay / sum of pays in the atki array).
-  function atkiShare(yarn) {
-    var arr = state.iplikler.atki || [];
-    var totalPay = 0;
-    for (var i = 0; i < arr.length; i++) {
-      var pv = parseFloat(arr[i].pay);
-      totalPay += (Number.isFinite(pv) && pv > 0) ? pv : 1;
-    }
-    if (totalPay <= 0) totalPay = 1;
-    var p = parseFloat(yarn.pay);
-    if (!Number.isFinite(p) || p <= 0) p = 1;
-    return p / totalPay;
-  }
-
   function computeYarnGramaj(yarn, kind) {
     var den = parseFloat(yarn.denye) || 0;
     var kat = parseFloat(yarn.kat) || 1;
-    if (den <= 0) return 0;
+    var tel = parseFloat(yarn.tel) || 0;
+    if (den <= 0 || tel <= 0) return 0;
     if (kind === "cozgu") {
-      var tel = parseFloat(yarn.tel) || 0;
       return window.Formulas.tukH(yarn.tip, den, kat, tel, 1, window.FPD);
     }
-    // atki — classic textile formula
-    var aSik = parseFloat(state.fis.atkiSik) || 0;
+    // atki — tel = tel adedi per 1 metre of fabric; thread length = tarakEn cm
     var tarakEn = parseFloat(state.fis.tarakEn) || 0;
-    if (aSik <= 0 || tarakEn <= 0) return 0;
-    var lenM = aSik * tarakEn * atkiShare(yarn);
+    if (tarakEn <= 0) return 0;
+    var lenM = tel * tarakEn / 100; // metres of yarn per metre of fabric
     var fp = window.FPD;
     if (yarn.tip === "DENYE") return lenM * den * kat / fp.denye_base;
     if (yarn.tip === "DTEX")  return lenM * den * kat / fp.dtex_base;
@@ -452,7 +433,7 @@
       else if (!parsed.valid) hint = parsed.badOp
         ? (yarn.tip === "NE" || yarn.tip === "NM" ? "Ne/Nm için '/' kullanın" : "Denye/dtex için '*' kullanın")
         : "Geçersiz " + numLabelFor(yarn.tip);
-      else if (kind === "cozgu" && !isPos(yarn.tel)) hint = "Tel girin";
+      else if (!isPos(yarn.tel)) hint = kind === "atki" ? "Tel adedi girin (örn. 4000)" : "Tel girin";
       else if (!isPos(yarn.fiyat)) hint = "Fiyat girin";
       else hint = "Eksik bilgi";
       pre.textContent = hint;
