@@ -1,0 +1,1 @@
+ALTER TABLE "arge_talepleri" ADD COLUMN "yarn_order_status" varchar(60);
