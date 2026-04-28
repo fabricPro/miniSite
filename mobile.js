@@ -317,7 +317,7 @@
       "</div>" +
       '<div class="grid-2">' +
       (kind === "atki"
-        ? '  <label class="field"><div class="label-row"><span>Pay <small>(oran)</small></span></div><input data-k="pay" type="number" inputmode="decimal" step="0.5" min="0" placeholder="1" /></label>'
+        ? '  <label class="field"><div class="label-row"><span>Tel adedi</span><button type="button" class="info" data-tip="Raport (desen) içindeki tel sayısı. Tek tip atkı için 1 bırakın. 2-1 raportta 2 ve 1 yazın.">ⓘ</button></div><input data-k="pay" type="number" inputmode="decimal" step="1" min="0" placeholder="1" /></label>'
         : '  <label class="field"><div class="label-row"><span>Tel</span></div><input data-k="tel" type="number" inputmode="decimal" step="1" min="0" /></label>') +
       '  <label class="field"><div class="label-row"><span>Fiyat $/kg</span></div><input data-k="fiyat" type="number" inputmode="decimal" step="0.01" min="0" /></label>' +
       "</div>" +
