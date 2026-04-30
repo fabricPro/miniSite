@@ -88,7 +88,10 @@ export function NumuneListTable({
             r.durum === "tamamlandi" || r.durum === "iptal";
           return (
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-medium text-indigo-600 dark:text-indigo-400">
+              <span
+                className="font-mono font-semibold tracking-tight"
+                style={{ color: "var(--mod-numune)" }}
+              >
                 {r.numuneNo}
               </span>
               {showBadge && (
@@ -271,8 +274,8 @@ export function NumuneListTable({
         className="flex-1 overflow-auto rounded-md border bg-card"
       >
         <table
-          className="w-full text-sm"
-          style={{ tableLayout: "fixed", minWidth: totalColumnWidth }}
+          className="text-sm"
+          style={{ tableLayout: "fixed", width: totalColumnWidth }}
         >
           <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur border-b">
             {table.getHeaderGroups().map((hg) => (
@@ -329,17 +332,21 @@ export function NumuneListTable({
                       router.push(`/numune-dokuma/${numuneNo}`)
                     }
                     className={cn(
-                      "cursor-pointer border-b",
+                      "cursor-pointer border-b transition-colors",
                       "absolute top-0 left-0 w-full flex",
-                      isSelected
-                        ? "bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-950/60"
-                        : "hover:bg-muted/40",
+                      !isSelected && "hover:bg-muted/40",
                       durum === "tamamlandi" && !isSelected && "opacity-70",
                       durum === "iptal" && !isSelected && "opacity-60"
                     )}
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
+                      ...(isSelected && {
+                        background:
+                          "color-mix(in oklch, var(--mod-numune) 12%, transparent)",
+                        boxShadow:
+                          "inset 3px 0 0 0 var(--mod-numune), 0 0 24px -8px color-mix(in oklch, var(--mod-numune) 40%, transparent)",
+                      }),
                     }}
                   >
                     {row.getVisibleCells().map((cell) => (

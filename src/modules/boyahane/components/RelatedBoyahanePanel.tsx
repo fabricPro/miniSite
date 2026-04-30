@@ -3,18 +3,16 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, Package2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import { DangerDialogHeader } from "@/components/ui/danger-dialog-header";
 import { formatTR } from "@/lib/utils/dates";
 import { BoyahaneDurumBadge } from "./BoyahaneDurumBadge";
 import { BulkTopDialog } from "./BulkTopDialog";
@@ -65,13 +63,7 @@ export function RelatedBoyahanePanel({
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          İlgili Toplar
-          <span className="ml-2 text-xs tabular-nums">
-            ({partileri.length})
-          </span>
-        </h3>
+      <div className="flex items-center justify-end mb-3">
         <BulkTopDialog
           numune={numune}
           fasonOptions={fasonOptions}
@@ -85,10 +77,12 @@ export function RelatedBoyahanePanel({
       </div>
 
       {partileri.length === 0 ? (
-        <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-          Bu numune için top yok. KK barkodlarını &quot;Top Ekle&quot; ile
-          tek seferde ekleyebilirsin.
-        </div>
+        <EmptyState
+          icon={Package2}
+          iconColor="var(--mod-boyane)"
+          title="Bu numune için top yok"
+          description="KK barkodlarını &ldquo;Top Ekle&rdquo; ile tek seferde ekleyebilirsin."
+        />
       ) : (
         <ul className="space-y-2">
           {partileri.map((p) => (
@@ -152,13 +146,10 @@ export function RelatedBoyahanePanel({
         onOpenChange={(o) => !o && setConfirmDelete(null)}
       >
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Topu sil</DialogTitle>
-            <DialogDescription>
-              <strong className="font-mono">{confirmDelete?.topNo}</strong>{" "}
-              kalıcı olarak silinecek. Bu işlem geri alınamaz.
-            </DialogDescription>
-          </DialogHeader>
+          <DangerDialogHeader title="Topu sil">
+            <strong className="font-mono">{confirmDelete?.topNo}</strong>{" "}
+            kalıcı olarak silinecek. Bu işlem geri alınamaz.
+          </DangerDialogHeader>
           <DialogFooter>
             <Button
               variant="outline"

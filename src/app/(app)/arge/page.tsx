@@ -1,3 +1,5 @@
+import { FlaskConical } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   getArgeTalebi,
   listActiveActionTypes,
@@ -44,18 +46,15 @@ export default async function ArgePage({ searchParams }: PageProps) {
     : null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-1px)] p-6 gap-4">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Ar-Ge Talepleri
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Satıra tık → sol panelde aç · çift tık → tam sayfa · Esc → kapat
-          </p>
-        </div>
-        <NewArgeDialog customers={customerOptions} />
-      </header>
+    <div className="flex flex-col h-[calc(100vh-2.5rem)] p-6 gap-4">
+      <PageHeader
+        icon={FlaskConical}
+        accent="var(--mod-arge)"
+        title="Ar-Ge Talepleri"
+        count={rows.length}
+        description="Satıra tık → sol panelde aç · çift tık → tam sayfa · Esc → kapat"
+        actions={<NewArgeDialog customers={customerOptions} />}
+      />
 
       <ArgeTwoPane
         rows={rows}

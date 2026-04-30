@@ -3,7 +3,16 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, ExternalLink, FileDown, Trash2, X } from "lucide-react";
+import {
+  ChevronDown,
+  ExternalLink,
+  FileDown,
+  Layers,
+  Package2,
+  ScrollText,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,12 +23,10 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DangerDialogHeader } from "@/components/ui/danger-dialog-header";
 import { formatTRLong } from "@/lib/utils/dates";
 import { NumuneForm } from "./NumuneForm";
 import { VaryantGrid } from "./VaryantGrid";
@@ -125,44 +132,79 @@ export function NumuneDetailPanel({
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="px-5 py-4 border-b bg-muted/30">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-2xl font-semibold tracking-tight">
+    <div className="flex flex-col h-full bg-card">
+      {/* HEADER — modül rengi glow + büyük mono numune no */}
+      <header
+        className="relative px-5 py-5 border-b border-border overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in oklch, var(--mod-numune) 12%, var(--card)) 0%, var(--card) 70%)",
+        }}
+      >
+        {/* Sağ üst soft glow */}
+        <div
+          className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle, color-mix(in oklch, var(--mod-numune) 30%, transparent), transparent 70%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <h3
+                className="text-3xl font-bold font-mono tracking-tight leading-none"
+                style={{ color: "var(--mod-numune)" }}
+              >
                 {numune.numuneNo}
               </h3>
               <NumuneDurumBadge durum={numune.durum} />
+            </div>
+            <div className="mt-2 flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
+              <span className="font-medium">{formatTRLong(numune.date)}</span>
               {numune.tezgah && (
-                <span className="rounded-md bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
-                  Tezgah {numune.tezgah}
-                </span>
+                <>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span>
+                    Tezgah <strong className="text-foreground">{numune.tezgah}</strong>
+                  </span>
+                </>
               )}
               {numune.desen && (
-                <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                  {numune.desen}
-                </span>
-              )}
-            </div>
-            <p className="mt-1 text-sm text-muted-foreground truncate">
-              {formatTRLong(numune.date)}
-              {numune.recordNo && (
                 <>
-                  {" · "}
+                  <span className="text-muted-foreground/50">·</span>
+                  <span>
+                    Desen <strong className="text-foreground">{numune.desen}</strong>
+                  </span>
+                </>
+              )}
+              {numune.recordNo ? (
+                <>
+                  <span className="text-muted-foreground/50">·</span>
                   <Link
                     href={`/arge/${numune.recordNo}`}
-                    className="underline-offset-4 hover:underline"
+                    className="font-mono font-semibold hover:underline"
+                    style={{ color: "var(--mod-arge)" }}
                   >
                     {numune.recordNo}
                   </Link>
-                  {customerName && ` · ${customerName}`}
+                  {customerName && (
+                    <>
+                      <span className="text-muted-foreground/50">·</span>
+                      <span>{customerName}</span>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span className="italic">CSR atanmamış</span>
                 </>
               )}
-              {!numune.recordNo && " · CSR atanmamış"}
-            </p>
+            </div>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="relative flex items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -200,13 +242,11 @@ export function NumuneDetailPanel({
                 <Trash2 className="h-4 w-4" />
               </DialogTrigger>
               <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Numune sil</DialogTitle>
-                  <DialogDescription>
-                    <strong>{numune.numuneNo}</strong> ve {varyantlar.length}{" "}
-                    varyantı kalıcı olarak silinecek. Bu işlem geri alınamaz.
-                  </DialogDescription>
-                </DialogHeader>
+                <DangerDialogHeader title="Numune sil">
+                  <strong className="font-mono">{numune.numuneNo}</strong> ve{" "}
+                  {varyantlar.length} varyantı kalıcı olarak silinecek. Bu işlem
+                  geri alınamaz.
+                </DangerDialogHeader>
                 <DialogFooter>
                   <Button
                     variant="outline"
@@ -239,41 +279,74 @@ export function NumuneDetailPanel({
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
-        <Collapsible defaultOpen>
-          <CollapsibleTrigger
-            render={
-              <button
-                type="button"
-                className="group flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 -mx-2 text-left hover:bg-muted/50 transition-colors"
+      {/* CONTENT — kart yapısı, her section ayrı blok */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-background/40">
+        {/* Section 1: Numune Bilgileri (collapsible) */}
+        <section className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <Collapsible defaultOpen>
+            <CollapsibleTrigger
+              render={
+                <button
+                  type="button"
+                  className="group flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-muted/40 transition-colors"
+                />
+              }
+            >
+              <div className="flex items-center gap-2">
+                <ScrollText
+                  className="h-4 w-4"
+                  style={{ color: "var(--mod-numune)" }}
+                />
+                <span className="text-sm font-semibold">
+                  Numune Bilgileri
+                </span>
+              </div>
+              <ChevronDown
+                className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[panel-open]:rotate-180"
+                aria-hidden="true"
               />
-            }
-          >
-            <span className="text-sm font-medium text-muted-foreground">
-              Numune Bilgileri
-            </span>
-            <ChevronDown
-              className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[panel-open]:rotate-180"
-              aria-hidden="true"
-            />
-          </CollapsibleTrigger>
-          <CollapsiblePanel>
-            <div className="pt-4">
-              <NumuneForm
-                key={numune.numuneNo}
-                csrOptions={csrOptions}
-                defaultValues={defaults}
-                onSubmit={handleSubmit}
-                submitLabel="Güncelle"
-              />
-            </div>
-          </CollapsiblePanel>
-        </Collapsible>
+            </CollapsibleTrigger>
+            <CollapsiblePanel>
+              <div className="px-4 pb-4 pt-2 border-t border-border/60">
+                <NumuneForm
+                  key={numune.numuneNo}
+                  csrOptions={csrOptions}
+                  defaultValues={defaults}
+                  onSubmit={handleSubmit}
+                  submitLabel="Güncelle"
+                />
+              </div>
+            </CollapsiblePanel>
+          </Collapsible>
+        </section>
 
-        <div className="border-t pt-6">
+        {/* Section 2: Varyantlar */}
+        <section className="rounded-xl border border-border/60 bg-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Layers
+              className="h-4 w-4"
+              style={{ color: "var(--mod-numune)" }}
+            />
+            <h3 className="text-sm font-semibold">Varyantlar</h3>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              ({varyantlar.length})
+            </span>
+          </div>
           <VaryantGrid numune={numune} varyantlar={varyantlar} />
-        </div>
-        <div className="border-t pt-6">
+        </section>
+
+        {/* Section 3: İlgili Toplar (boyahane) */}
+        <section className="rounded-xl border border-border/60 bg-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Package2
+              className="h-4 w-4"
+              style={{ color: "var(--mod-boyane)" }}
+            />
+            <h3 className="text-sm font-semibold">İlgili Toplar</h3>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              ({boyahanePartileri.length})
+            </span>
+          </div>
           <RelatedBoyahanePanel
             numune={{
               id: numune.id,
@@ -284,7 +357,7 @@ export function NumuneDetailPanel({
             partileri={boyahanePartileri}
             fasonOptions={fasonOptions}
           />
-        </div>
+        </section>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { SoftBadge } from "./SoftBadge";
 import type { FinalStatus } from "../types";
 
 const LABELS: Record<FinalStatus, string> = {
@@ -8,10 +7,10 @@ const LABELS: Record<FinalStatus, string> = {
   cancelled: "İptal",
 };
 
-const COLORS: Record<FinalStatus, string> = {
-  open: "bg-indigo-600 hover:bg-indigo-600 text-white",
-  closed: "bg-green-600 hover:bg-green-600 text-white",
-  cancelled: "bg-slate-400 hover:bg-slate-400 text-white",
+const COLOR_VAR: Record<FinalStatus, string> = {
+  open: "var(--mod-arge)", // cyan-blue (Ar-Ge modülünün rengi)
+  closed: "var(--success)", // yeşil
+  cancelled: "var(--muted-foreground)", // muted gri
 };
 
 interface Props {
@@ -22,16 +21,14 @@ interface Props {
 
 export function StatusBadge({ status, size = "sm", className }: Props) {
   const s = (status ?? "open") as FinalStatus;
-  const sizeClass =
-    size === "xs"
-      ? "px-1.5 py-0 text-[10px] font-medium leading-4"
-      : undefined;
   return (
-    <Badge
-      variant="outline"
-      className={cn("border-0", COLORS[s] ?? COLORS.open, sizeClass, className)}
+    <SoftBadge
+      color={COLOR_VAR[s] ?? COLOR_VAR.open}
+      size={size}
+      className={className}
+      withDot
     >
       {LABELS[s] ?? s}
-    </Badge>
+    </SoftBadge>
   );
 }

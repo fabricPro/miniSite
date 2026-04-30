@@ -94,7 +94,10 @@ export function ArgeListTable({
           const showStatus = status === "closed" || status === "cancelled";
           return (
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-medium text-indigo-600 dark:text-indigo-400">
+              <span
+                className="font-mono font-semibold tracking-tight"
+                style={{ color: "var(--mod-arge)" }}
+              >
                 {row.original.recordNo}
               </span>
               {showStatus && (
@@ -109,6 +112,8 @@ export function ArgeListTable({
         },
         size: compact ? 130 : 140,
       },
+      // Müşteri
+      // — geniş ad'lar için (örn. "ANKARA TEKSTİL") rahat genişlik
       {
         accessorKey: "customerName",
         header: ({ column }) => (
@@ -118,17 +123,19 @@ export function ArgeListTable({
           />
         ),
         cell: ({ getValue }) => (
-          <span>{getValue<string | null>() ?? "-"}</span>
+          <span className="truncate">{getValue<string | null>() ?? "-"}</span>
         ),
-        size: compact ? 140 : 200,
+        size: compact ? 150 : 220,
       },
       {
         accessorKey: "fabricNameCode",
         header: "Kumaş Adı / Kod",
         cell: ({ getValue }) => (
-          <span className="text-sm">{getValue<string | null>() ?? "-"}</span>
+          <span className="text-sm truncate">
+            {getValue<string | null>() ?? "-"}
+          </span>
         ),
-        size: compact ? 160 : 240,
+        size: compact ? 170 : 260,
       },
       {
         accessorKey: "arrivalDate",
@@ -141,7 +148,7 @@ export function ArgeListTable({
         cell: ({ getValue }) => (
           <span className="tabular-nums">{formatTR(getValue<string>())}</span>
         ),
-        size: 85,
+        size: 100,
       },
       {
         accessorKey: "dueDate",
@@ -154,7 +161,7 @@ export function ArgeListTable({
         cell: ({ getValue }) => (
           <span className="tabular-nums">{formatTR(getValue<string>())}</span>
         ),
-        size: 85,
+        size: 100,
       },
       {
         id: "remaining",
@@ -165,7 +172,7 @@ export function ArgeListTable({
             completionDate={row.original.completionDate}
           />
         ),
-        size: 120,
+        size: 140,
       },
       {
         id: "lastAction",
@@ -186,7 +193,7 @@ export function ArgeListTable({
             </div>
           );
         },
-        size: compact ? 150 : 180,
+        size: compact ? 170 : 240,
       },
     ];
     return base;
@@ -285,8 +292,8 @@ export function ArgeListTable({
         className="flex-1 overflow-auto rounded-md border bg-card"
       >
         <table
-          className="w-full text-sm"
-          style={{ tableLayout: "fixed", minWidth: totalColumnWidth }}
+          className="text-sm"
+          style={{ tableLayout: "fixed", width: totalColumnWidth }}
         >
           <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur border-b">
             {table.getHeaderGroups().map((hg) => (
@@ -341,17 +348,21 @@ export function ArgeListTable({
                     onClick={handleClick}
                     onDoubleClick={() => router.push(`/arge/${recordNo}`)}
                     className={cn(
-                      "cursor-pointer border-b",
+                      "cursor-pointer border-b transition-colors",
                       "absolute top-0 left-0 w-full flex",
-                      isSelected
-                        ? "bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-950/60"
-                        : "hover:bg-muted/40",
+                      !isSelected && "hover:bg-muted/40",
                       status === "closed" && !isSelected && "opacity-70",
                       status === "cancelled" && !isSelected && "opacity-60"
                     )}
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
+                      ...(isSelected && {
+                        background:
+                          "color-mix(in oklch, var(--mod-arge) 12%, transparent)",
+                        boxShadow:
+                          "inset 3px 0 0 0 var(--mod-arge), 0 0 24px -8px color-mix(in oklch, var(--mod-arge) 40%, transparent)",
+                      }),
                     }}
                   >
                     {row.getVisibleCells().map((cell) => (

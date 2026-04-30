@@ -105,6 +105,47 @@ Yeni bir modül eklemek (örn. numune dokuma) için:
 
 İşletmeye taşıyınca `.env`'de `ERP_DATABASE_URL` ve `ERP_DB_TYPE` (`mssql` | `mysql` | `postgres`) ayarla. `src/lib/db/erp-client.ts` bu değişkeni algılar, aktif olur. Sorgular `src/modules/erp-bridge/queries/` altında ham SQL olarak yazılır.
 
+## Cloud Deploy (Vercel + Neon)
+
+Üretim için en hızlı yol: **Vercel** (hosting) + **Neon** (managed Postgres). Her ikisi de free tier ile başlar.
+
+### 1. Neon kurulumu
+
+1. https://neon.tech → GitHub ile login → "Create project"
+2. Project name: `numune-master`, Postgres 16, Region: Frankfurt (Türkiye'ye yakın)
+3. İki connection string al:
+   - **Pooled** (`-pooler` içerir) → Vercel runtime için
+   - **Direct** (`-pooler` yok) → migration / db:push için
+
+### 2. Şema + veri taşıma
+
+```bash
+# Şemayı Neon'a uygula
+DATABASE_URL="<neon-direct-url>" npm run db:push
+
+# Lokal veriyi yedekle
+npm run db:backup
+
+# Neon'a import et
+psql "<neon-direct-url>" < backups/numune_YYYYMMDD.sql
+
+# Veya boş başla + seed
+DATABASE_URL="<neon-direct-url>" npm run db:seed
+```
+
+### 3. Vercel deploy
+
+1. https://vercel.com → GitHub ile login → "Import Project" → repo seç
+2. **Environment Variables** sekmesinde ekle:
+   - `DATABASE_URL` = Neon **pooled** URL (production runtime için)
+   - `AUTH_SECRET` = `openssl rand -base64 32` ile üret
+3. Deploy → URL al (örn. `numune-master.vercel.app`)
+4. Telefondan + iş PC'sinden test
+
+### 4. Custom domain (opsiyonel)
+
+Vercel dashboard → Settings → Domains → `numune.firmaadi.com` ekle, DNS yönlendir.
+
 ## VPS'e Taşıma
 
 ```bash

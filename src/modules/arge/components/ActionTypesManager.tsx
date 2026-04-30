@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogContent,
@@ -116,9 +117,7 @@ export function ActionTypesManager({ items }: Props) {
           Aktif ({active.length})
         </h3>
         {active.length === 0 ? (
-          <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-            Aktif işlem tipi yok.
-          </div>
+          <EmptyState title="Aktif işlem tipi yok" />
         ) : (
           <ActionTypeTable
             rows={active}

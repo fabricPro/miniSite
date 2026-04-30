@@ -35,7 +35,7 @@ export default async function ArgeDetailPage({ params }: Props) {
   ]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-1px)] p-6 gap-4 max-w-5xl mx-auto w-full">
+    <div className="flex flex-col h-[calc(100vh-2.5rem)] p-6 gap-4 max-w-5xl mx-auto w-full">
       <div className="flex items-center justify-between gap-4">
         <Button variant="ghost" size="sm" render={<Link href="/arge" />}>
           <ArrowLeft className="h-4 w-4" />

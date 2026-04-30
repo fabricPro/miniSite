@@ -66,9 +66,17 @@ export function LoginForm() {
             />
           </div>
           {error && (
-            <p className="text-sm text-red-600" role="alert">
+            <div
+              className="rounded-md px-3 py-2 text-sm"
+              style={{
+                background: "color-mix(in oklch, var(--destructive) 12%, transparent)",
+                color: "var(--destructive)",
+                border: "1px solid color-mix(in oklch, var(--destructive) 25%, transparent)",
+              }}
+              role="alert"
+            >
               {error}
-            </p>
+            </div>
           )}
         </CardContent>
         <CardFooter>

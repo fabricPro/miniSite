@@ -8,12 +8,10 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DangerDialogHeader } from "@/components/ui/danger-dialog-header";
 import { deleteBoyahaneParti } from "../server/actions";
 
 interface Props {
@@ -55,13 +53,10 @@ export function DeletePartiButton({ id, topNo }: Props) {
         Sil
       </DialogTrigger>
       <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Boyahane partisini sil</DialogTitle>
-          <DialogDescription>
-            <strong className="font-mono">{topNo}</strong> kalıcı olarak
-            silinecek. Bu işlem geri alınamaz.
-          </DialogDescription>
-        </DialogHeader>
+        <DangerDialogHeader title="Boyahane partisini sil">
+          <strong className="font-mono">{topNo}</strong> kalıcı olarak
+          silinecek. Bu işlem geri alınamaz.
+        </DangerDialogHeader>
         <DialogFooter>
           <Button
             variant="outline"

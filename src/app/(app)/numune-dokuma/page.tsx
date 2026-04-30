@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Scissors } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   getNumuneByNo,
   listDistinctTezgah,
@@ -49,21 +50,20 @@ export default async function NumuneDokumaPage({ searchParams }: PageProps) {
     : null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-1px)] p-6 gap-4">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Numune Dokuma
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Satıra tık → sol panelde aç · çift tık → tam sayfa · Esc → kapat
-          </p>
-        </div>
-        <Button render={<Link href="/numune-dokuma/yeni" />}>
-          <Plus className="h-4 w-4" />
-          Yeni Numune
-        </Button>
-      </header>
+    <div className="flex flex-col h-[calc(100vh-2.5rem)] p-6 gap-4">
+      <PageHeader
+        icon={Scissors}
+        accent="var(--mod-numune)"
+        title="Numune Dokuma"
+        count={rows.length}
+        description="Satıra tık → sol panelde aç · çift tık → tam sayfa · Esc → kapat"
+        actions={
+          <Button render={<Link href="/numune-dokuma/yeni" />}>
+            <Plus className="h-4 w-4" />
+            Yeni Numune
+          </Button>
+        }
+      />
 
       <NumuneTwoPane
         rows={rows}

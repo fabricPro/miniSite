@@ -3,7 +3,16 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, ExternalLink, Trash2, X } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ExternalLink,
+  History,
+  Layers3,
+  ScrollText,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -147,12 +156,30 @@ export function ArgeDetailPanel({
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="px-5 py-4 border-b bg-muted/30">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-2xl font-semibold tracking-tight">
+    <div className="flex flex-col h-full bg-card">
+      {/* HEADER — Ar-Ge modül rengi (cyan) glow + büyük mono recordNo */}
+      <header
+        className="relative px-5 py-5 border-b border-border overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in oklch, var(--mod-arge) 12%, var(--card)) 0%, var(--card) 70%)",
+        }}
+      >
+        <div
+          className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle, color-mix(in oklch, var(--mod-arge) 30%, transparent), transparent 70%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <h3
+                className="text-3xl font-bold font-mono tracking-tight leading-none"
+                style={{ color: "var(--mod-arge)" }}
+              >
                 {record.recordNo}
               </h3>
               <StatusBadge status={record.finalStatus} />
@@ -161,12 +188,21 @@ export function ArgeDetailPanel({
                 completionDate={record.completionDate}
               />
             </div>
-            <p className="mt-1 text-sm text-muted-foreground truncate">
-              {customerName ?? "Müşteri atanmamış"} · {formatTRLong(record.arrivalDate)} →{" "}
-              {formatTRLong(record.dueDate)}
-            </p>
+            <div className="mt-2 flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">
+                {customerName ?? "Müşteri atanmamış"}
+              </span>
+              <span className="text-muted-foreground/50">·</span>
+              <span>
+                Geliş <strong className="text-foreground">{formatTRLong(record.arrivalDate)}</strong>
+              </span>
+              <span className="text-muted-foreground/50">→</span>
+              <span>
+                Termin <strong className="text-foreground">{formatTRLong(record.dueDate)}</strong>
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="relative flex items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -190,12 +226,28 @@ export function ArgeDetailPanel({
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Kaydı sil</DialogTitle>
-                  <DialogDescription>
-                    <strong>{record.recordNo}</strong> kaydı ve bu kayda bağlı
-                    tüm hareket logu kalıcı olarak silinecek. Bu işlem geri
-                    alınamaz.
-                  </DialogDescription>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="grid place-items-center h-9 w-9 rounded-full shrink-0 mt-0.5"
+                      style={{
+                        background:
+                          "color-mix(in oklch, var(--destructive) 14%, transparent)",
+                      }}
+                    >
+                      <AlertTriangle
+                        className="h-4 w-4"
+                        style={{ color: "var(--destructive)" }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <DialogTitle>Kaydı sil</DialogTitle>
+                      <DialogDescription>
+                        <strong className="font-mono">{record.recordNo}</strong>{" "}
+                        kaydı ve bu kayda bağlı tüm hareket logu kalıcı olarak
+                        silinecek. Bu işlem geri alınamaz.
+                      </DialogDescription>
+                    </div>
+                  </div>
                 </DialogHeader>
                 <DialogFooter>
                   <Button
@@ -229,49 +281,81 @@ export function ArgeDetailPanel({
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
-        <Collapsible defaultOpen>
-          <CollapsibleTrigger
-            render={
-              <button
-                type="button"
-                className="group flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 -mx-2 text-left hover:bg-muted/50 transition-colors"
+      {/* CONTENT — kart yapısı */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-background/40">
+        {/* Section 1: Detay Formu */}
+        <section className="rounded-xl border border-border/60 bg-card overflow-hidden">
+          <Collapsible defaultOpen>
+            <CollapsibleTrigger
+              render={
+                <button
+                  type="button"
+                  className="group flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-muted/40 transition-colors"
+                />
+              }
+            >
+              <div className="flex items-center gap-2">
+                <ScrollText
+                  className="h-4 w-4"
+                  style={{ color: "var(--mod-arge)" }}
+                />
+                <span className="text-sm font-semibold">Detay Formu</span>
+              </div>
+              <ChevronDown
+                className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[panel-open]:rotate-180"
+                aria-hidden="true"
               />
-            }
-          >
-            <span className="text-sm font-medium text-muted-foreground">
-              Detay Formu
-            </span>
-            <ChevronDown
-              className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[panel-open]:rotate-180"
-              aria-hidden="true"
+            </CollapsibleTrigger>
+            <CollapsiblePanel>
+              <div className="px-4 pb-4 pt-2 border-t border-border/60">
+                <ArgeForm
+                  key={record.recordNo}
+                  customers={customers}
+                  defaultValues={defaults}
+                  onSubmit={handleSubmit}
+                  submitLabel="Güncelle"
+                />
+              </div>
+            </CollapsiblePanel>
+          </Collapsible>
+        </section>
+
+        {/* Section 2: Hareket Logu */}
+        <section className="rounded-xl border border-border/60 bg-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <History
+              className="h-4 w-4"
+              style={{ color: "var(--mod-arge)" }}
             />
-          </CollapsibleTrigger>
-          <CollapsiblePanel>
-            <div className="pt-4">
-              <ArgeForm
-                key={record.recordNo}
-                customers={customers}
-                defaultValues={defaults}
-                onSubmit={handleSubmit}
-                submitLabel="Güncelle"
-              />
-            </div>
-          </CollapsiblePanel>
-        </Collapsible>
-        <div className="border-t pt-6">
+            <h3 className="text-sm font-semibold">Hareket Logu</h3>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              ({logs.length})
+            </span>
+          </div>
           <HareketLogPanel
             recordNo={record.recordNo}
             logs={logs}
             actionTypes={actionTypes}
           />
-        </div>
-        <div className="border-t pt-6">
+        </section>
+
+        {/* Section 3: İlgili Numuneler */}
+        <section className="rounded-xl border border-border/60 bg-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Layers3
+              className="h-4 w-4"
+              style={{ color: "var(--mod-numune)" }}
+            />
+            <h3 className="text-sm font-semibold">İlgili Numuneler</h3>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              ({relatedNumuneler.length})
+            </span>
+          </div>
           <RelatedNumunelerPanel
             recordNo={record.recordNo}
             numuneler={relatedNumuneler}
           />
-        </div>
+        </section>
       </div>
     </div>
   );

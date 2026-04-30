@@ -11,11 +11,9 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
+import { DangerDialogHeader } from "@/components/ui/danger-dialog-header";
 import { deleteBoyahaneParti } from "../server/actions";
 import {
   Select,
@@ -54,8 +52,10 @@ function gecenGun(talepTarihi: string | null): {
   today.setUTCHours(0, 0, 0, 0);
   const diff = Math.round((today.getTime() - d.getTime()) / 86400_000);
   if (diff < 0) return { text: "—", tone: "default" };
-  if (diff >= 8) return { text: `${diff} Gün`, tone: "red" };
-  if (diff >= 3) return { text: `${diff} Gün`, tone: "amber" };
+  // Yeniden ayarlanan eşikler: 0-7 normal, 8-14 amber, 15+ kırmızı
+  // Eskiden 3+ amber / 8+ kırmızı'ydı — her şey kırmızıya boyandığı için anlamı kaybolmuştu
+  if (diff >= 15) return { text: `${diff} Gün`, tone: "red" };
+  if (diff >= 8) return { text: `${diff} Gün`, tone: "amber" };
   return { text: `${diff} Gün`, tone: "default" };
 }
 
@@ -129,6 +129,19 @@ export function BoyahaneListTable({
     estimateSize: () => 36,
     overscan: 12,
   });
+
+  /** D.Try'a göre grup index'leri — aynı kod ardışık olduğunda aynı grup */
+  const groupIdxByRow = React.useMemo(() => {
+    const result: number[] = [];
+    let group = 0;
+    for (let i = 0; i < filteredRows.length; i++) {
+      if (i > 0 && filteredRows[i].dTry !== filteredRows[i - 1].dTry) {
+        group++;
+      }
+      result.push(group);
+    }
+    return result;
+  }, [filteredRows]);
 
   const allFilteredIds = React.useMemo(
     () => filteredRows.map((r) => r.id),
@@ -264,12 +277,12 @@ export function BoyahaneListTable({
         className="flex-1 overflow-auto rounded-md border bg-card"
       >
         <table
-          className="w-full text-xs"
-          style={{ tableLayout: "fixed", minWidth: 1500 }}
+          className="text-xs"
+          style={{ tableLayout: "fixed", width: 1500 }}
         >
           <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur border-b">
             <tr>
-              <th className="w-8 px-2 py-2">
+              <th className="px-2 py-2" style={{ width: 32 }}>
                 <input
                   type="checkbox"
                   checked={allFilteredSelected}
@@ -278,43 +291,43 @@ export function BoyahaneListTable({
                   title="Tümünü seç"
                 />
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 110 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 120 }}>
                 Top No
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 80 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 90 }}>
                 Talep
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 70 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 80 }}>
                 Geçen
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 80 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 90 }}>
                 D.Try
               </th>
-              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 50 }}>
+              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 60 }}>
                 En
               </th>
-              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 50 }}>
+              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 60 }}>
                 İst.En
               </th>
-              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 60 }}>
+              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 70 }}>
                 Metre
               </th>
-              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 60 }}>
+              <th className="text-right px-2 py-2 font-medium text-muted-foreground" style={{ width: 70 }}>
                 Kilo
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 90 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 110 }}>
                 Desen
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 240 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 280 }}>
                 Yapılacak İşlem
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 130 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 150 }}>
                 Fason
               </th>
-              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 140 }}>
+              <th className="text-left px-2 py-2 font-medium text-muted-foreground" style={{ width: 160 }}>
                 Durum
               </th>
-              <th className="w-20 px-2 py-2"></th>
+              <th className="px-2 py-2" style={{ width: 130 }}></th>
             </tr>
           </thead>
           <tbody
@@ -341,21 +354,57 @@ export function BoyahaneListTable({
                 const gecen = gecenGun(r.talepTarihi);
                 const checked = selectedIds.has(r.id);
                 const isReturned = r.durum === "islemden_gelmis";
+                const groupIdx = groupIdxByRow[virtualRow.index] ?? 0;
+                const isGroupStart =
+                  virtualRow.index === 0 ||
+                  groupIdxByRow[virtualRow.index - 1] !== groupIdx;
+
+                // Status-bazlı satır tinti — tek bakışta blok blok renk hissi (Excel paterni)
+                // selection (checked) bu tinti override eder
+                let statusBg: string | undefined;
+                if (!checked) {
+                  switch (r.durum) {
+                    case "islemden_gelmis":
+                      statusBg =
+                        "color-mix(in oklch, var(--success) 6%, transparent)";
+                      break;
+                    case "islemden_iade":
+                      statusBg =
+                        "color-mix(in oklch, var(--destructive) 6%, transparent)";
+                      break;
+                    case "talimat_atildi":
+                      statusBg =
+                        "color-mix(in oklch, var(--warning) 6%, transparent)";
+                      break;
+                    // "islemde" → tint yok (default akış, görsel olarak nötr)
+                  }
+                }
+
+                // D.Try grup ayracı: 3px renkli üst şerit (mod-numune ile renk kodu hissi)
+                const groupBorder =
+                  isGroupStart && virtualRow.index > 0
+                    ? "inset 0 3px 0 0 color-mix(in oklch, var(--mod-numune) 40%, transparent)"
+                    : undefined;
+
                 return (
                   <tr
                     key={r.id}
                     className={cn(
-                      "border-b flex absolute top-0 left-0 w-full",
-                      "hover:bg-muted/40",
-                      checked && "bg-indigo-50/60 dark:bg-indigo-950/30",
-                      isReturned && !checked && "opacity-70"
+                      "border-b flex absolute top-0 left-0 w-full transition-colors",
+                      "hover:bg-muted/50",
+                      checked && "bg-indigo-50/60 dark:bg-indigo-950/30"
                     )}
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
+                      ...(statusBg && { background: statusBg }),
+                      ...(groupBorder && { boxShadow: groupBorder }),
                     }}
                   >
-                    <td className="w-8 px-2 py-1.5 shrink-0 flex items-center">
+                    <td
+                      className="px-2 py-1.5 shrink-0 flex items-center"
+                      style={{ width: 32 }}
+                    >
                       <input
                         type="checkbox"
                         checked={checked}
@@ -364,31 +413,39 @@ export function BoyahaneListTable({
                       />
                     </td>
                     <td
-                      className="px-2 py-1.5 shrink-0 truncate font-mono text-[11px] flex items-center"
-                      style={{ width: 110 }}
+                      className="px-2 py-1.5 shrink-0 truncate font-mono text-[11px] font-medium flex items-center"
+                      style={{ width: 120, color: "var(--mod-boyane)" }}
                     >
                       {r.topNo}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 tabular-nums flex items-center"
-                      style={{ width: 80 }}
+                      style={{ width: 90 }}
                     >
                       {r.talepTarihi ? formatTR(r.talepTarihi) : "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 tabular-nums flex items-center"
-                      style={{ width: 70 }}
+                      style={{ width: 80 }}
                     >
                       {isReturned ? (
-                        <span className="text-green-700 font-medium">
+                        <span className="text-muted-foreground">
                           {gecen.text}
                         </span>
                       ) : (
                         <span
                           className={cn(
-                            gecen.tone === "red" && "text-red-700 font-bold",
-                            gecen.tone === "amber" && "text-amber-700 font-medium"
+                            gecen.tone === "red" && "font-semibold",
+                            gecen.tone === "amber" && "font-medium",
+                            gecen.tone === "default" && "text-muted-foreground"
                           )}
+                          style={
+                            gecen.tone === "red"
+                              ? { color: "var(--destructive)" }
+                              : gecen.tone === "amber"
+                                ? { color: "var(--warning)" }
+                                : undefined
+                          }
                         >
                           {gecen.text}
                         </span>
@@ -396,12 +453,13 @@ export function BoyahaneListTable({
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 truncate flex items-center"
-                      style={{ width: 80 }}
+                      style={{ width: 90 }}
                     >
                       {r.numuneNo ? (
                         <Link
                           href={`/numune-dokuma/${r.numuneNo}`}
-                          className="text-indigo-600 hover:underline font-mono text-[11px]"
+                          className="hover:underline font-mono text-[11px] font-medium"
+                          style={{ color: "var(--mod-numune)" }}
                           onClick={(e) => e.stopPropagation()}
                         >
                           {r.numuneNo}
@@ -412,54 +470,57 @@ export function BoyahaneListTable({
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 text-right tabular-nums flex items-center justify-end"
-                      style={{ width: 50 }}
+                      style={{ width: 60 }}
                     >
                       {r.en ?? "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 text-right tabular-nums flex items-center justify-end"
-                      style={{ width: 50 }}
+                      style={{ width: 60 }}
                     >
                       {r.istenenEn ?? "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 text-right tabular-nums flex items-center justify-end"
-                      style={{ width: 60 }}
+                      style={{ width: 70 }}
                     >
                       {r.metre ?? "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 text-right tabular-nums flex items-center justify-end"
-                      style={{ width: 60 }}
+                      style={{ width: 70 }}
                     >
                       {r.kilo ?? "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 truncate flex items-center"
-                      style={{ width: 90 }}
+                      style={{ width: 110 }}
                     >
                       {r.desenNo ?? "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 truncate flex items-center"
-                      style={{ width: 240 }}
+                      style={{ width: 280 }}
                       title={r.yapilacakIslem ?? ""}
                     >
                       {r.yapilacakIslem ?? "—"}
                     </td>
                     <td
-                      className="px-2 py-1.5 shrink-0 truncate flex items-center"
-                      style={{ width: 130 }}
+                      className="px-2 py-1.5 shrink-0 truncate flex items-center text-muted-foreground"
+                      style={{ width: 150 }}
                     >
                       {r.fasonFirma ?? "—"}
                     </td>
                     <td
                       className="px-2 py-1.5 shrink-0 flex items-center"
-                      style={{ width: 140 }}
+                      style={{ width: 160 }}
                     >
                       <BoyahaneDurumBadge durum={r.durum} size="xs" />
                     </td>
-                    <td className="w-20 px-2 py-1.5 shrink-0 flex items-center justify-end gap-1">
+                    <td
+                      className="px-2 py-1.5 shrink-0 flex items-center justify-end gap-1"
+                      style={{ width: 130 }}
+                    >
                       <Button
                         variant="ghost"
                         size="sm"
@@ -496,13 +557,10 @@ export function BoyahaneListTable({
         onOpenChange={(o) => !o && setConfirmDelete(null)}
       >
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Boyahane partisini sil</DialogTitle>
-            <DialogDescription>
-              <strong className="font-mono">{confirmDelete?.topNo}</strong>{" "}
-              kalıcı olarak silinecek. Bu işlem geri alınamaz.
-            </DialogDescription>
-          </DialogHeader>
+          <DangerDialogHeader title="Boyahane partisini sil">
+            <strong className="font-mono">{confirmDelete?.topNo}</strong>{" "}
+            kalıcı olarak silinecek. Bu işlem geri alınamaz.
+          </DangerDialogHeader>
           <DialogFooter>
             <Button
               variant="outline"

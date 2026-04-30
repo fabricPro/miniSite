@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Layers3, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatTR } from "@/lib/utils/dates";
 import { NumuneDurumBadge } from "./NumuneDurumBadge";
 import type { RelatedNumuneRow } from "../server/queries";
@@ -13,13 +14,7 @@ interface Props {
 export function RelatedNumunelerPanel({ recordNo, numuneler }: Props) {
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          İlgili Numuneler
-          <span className="ml-2 text-xs tabular-nums">
-            ({numuneler.length})
-          </span>
-        </h3>
+      <div className="flex items-center justify-end mb-3">
         <Button
           variant="outline"
           size="sm"
@@ -35,9 +30,12 @@ export function RelatedNumunelerPanel({ recordNo, numuneler }: Props) {
       </div>
 
       {numuneler.length === 0 ? (
-        <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-          Bu kayda bağlı numune yok. &quot;Yeni Numune&quot; ile başla.
-        </div>
+        <EmptyState
+          icon={Layers3}
+          iconColor="var(--mod-numune)"
+          title="Bu kayda bağlı numune yok"
+          description="&ldquo;Yeni Numune&rdquo; ile bu CSR için ilk numuneyi oluştur."
+        />
       ) : (
         <ul className="space-y-2">
           {numuneler.map((n) => (

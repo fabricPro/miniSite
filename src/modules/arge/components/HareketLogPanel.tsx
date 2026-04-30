@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Trash2, History } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatTR } from "@/lib/utils/dates";
 import { deleteHareketLog } from "../server/actions";
 import { HareketLogDialog } from "./HareketLogDialog";
@@ -38,20 +39,17 @@ export function HareketLogPanel({ recordNo, logs, actionTypes }: Props) {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Hareket Logu
-          <span className="ml-2 text-xs tabular-nums">
-            ({logs.length})
-          </span>
-        </h3>
+      <div className="flex items-center justify-end mb-3">
         <HareketLogDialog recordNo={recordNo} actionTypes={actionTypes} />
       </div>
 
       {logs.length === 0 ? (
-        <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-          Henüz log kaydı yok. &quot;Log ekle&quot; ile ilk kaydı oluştur.
-        </div>
+        <EmptyState
+          icon={History}
+          iconColor="var(--mod-arge)"
+          title="Henüz hareket kaydı yok"
+          description="Üstteki &ldquo;Log ekle&rdquo; ile ilk kaydı oluştur."
+        />
       ) : (
         <ul className="space-y-2">
           {logs.map((log) => (

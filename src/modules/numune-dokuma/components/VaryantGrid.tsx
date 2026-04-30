@@ -278,13 +278,7 @@ export function VaryantGrid({ numune, varyantlar }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Varyantlar
-          <span className="ml-2 text-xs tabular-nums">
-            ({varyantlar.length})
-          </span>
-        </h3>
+      <div className="flex items-center justify-end">
         <Button
           type="button"
           variant="outline"

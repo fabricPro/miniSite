@@ -39,6 +39,16 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Modül renk tokenları */
+  --color-mod-arge: var(--mod-arge);
+  --color-mod-numune: var(--mod-numune);
+  --color-mod-boyane: var(--mod-boyane);
+  --color-mod-iplik: var(--mod-iplik);
+  --color-mod-cozgu: var(--mod-cozgu);
+  --color-mod-ayarlar: var(--mod-ayarlar);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -46,75 +56,125 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Yumuşak gölge tokenları */
+  --shadow-soft: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 1px 3px 0 oklch(0 0 0 / 0.06);
+  --shadow-card: 0 1px 3px 0 oklch(0 0 0 / 0.05), 0 1px 2px -1px oklch(0 0 0 / 0.04);
+  --shadow-popover: 0 4px 12px -2px oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.06);
+  /* NEON glow shadows — her aktif elementte renkli aura */
+  --shadow-glow-primary: 0 0 0 1px color-mix(in oklch, var(--primary) 40%, transparent),
+    0 4px 24px -4px color-mix(in oklch, var(--primary) 50%, transparent),
+    0 0 40px -8px color-mix(in oklch, var(--primary) 30%, transparent);
+  --shadow-glow-arge: 0 0 0 1px color-mix(in oklch, var(--mod-arge) 40%, transparent),
+    0 4px 20px -4px color-mix(in oklch, var(--mod-arge) 45%, transparent);
+  --shadow-glow-numune: 0 0 0 1px color-mix(in oklch, var(--mod-numune) 40%, transparent),
+    0 4px 20px -4px color-mix(in oklch, var(--mod-numune) 45%, transparent);
+  --shadow-glow-boyane: 0 0 0 1px color-mix(in oklch, var(--mod-boyane) 40%, transparent),
+    0 4px 20px -4px color-mix(in oklch, var(--mod-boyane) 45%, transparent);
+  --shadow-glow-iplik: 0 0 0 1px color-mix(in oklch, var(--mod-iplik) 40%, transparent),
+    0 4px 20px -4px color-mix(in oklch, var(--mod-iplik) 45%, transparent);
+  --shadow-glow-cozgu: 0 0 0 1px color-mix(in oklch, var(--mod-cozgu) 40%, transparent),
+    0 4px 20px -4px color-mix(in oklch, var(--mod-cozgu) 45%, transparent);
 }
 
+/* ─── LIGHT THEME — NEON ───
+   Yüksek doygunluk, electric tonlar, glow uyumlu açık tema.
+*/
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.985 0.005 285);
+  --foreground: oklch(0.16 0.02 285);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.16 0.02 285);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --popover-foreground: oklch(0.16 0.02 285);
+  /* Primary: electric purple */
+  --primary: oklch(0.58 0.32 290);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.012 285);
+  --secondary-foreground: oklch(0.2 0.02 285);
+  --muted: oklch(0.96 0.005 285);
+  --muted-foreground: oklch(0.5 0.02 285);
+  /* Accent: hot pink */
+  --accent: oklch(0.94 0.05 350);
+  --accent-foreground: oklch(0.4 0.25 350);
+  --destructive: oklch(0.6 0.3 22);
+  --border: oklch(0.91 0.01 285);
+  --input: oklch(0.93 0.01 285);
+  --ring: oklch(0.58 0.32 290 / 0.5);
+  /* Status — punchy */
+  --success: oklch(0.65 0.24 145);
+  --warning: oklch(0.74 0.22 70);
+  --info: oklch(0.65 0.22 215);
+  /* Modül — electric/neon */
+  --mod-arge: oklch(0.65 0.22 215);                /* electric cyan */
+  --mod-numune: oklch(0.58 0.32 290);              /* electric purple */
+  --mod-boyane: oklch(0.7 0.25 35);                /* hot orange */
+  --mod-iplik: oklch(0.66 0.3 350);                /* shocking pink */
+  --mod-cozgu: oklch(0.67 0.22 145);               /* vivid green */
+  --mod-ayarlar: oklch(0.55 0.06 285);
+  --chart-1: oklch(0.58 0.32 290);
+  --chart-2: oklch(0.65 0.22 215);
+  --chart-3: oklch(0.7 0.25 35);
+  --chart-4: oklch(0.67 0.22 145);
+  --chart-5: oklch(0.66 0.3 350);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.97 0.01 285);
+  --sidebar-foreground: oklch(0.2 0.02 285);
+  --sidebar-primary: oklch(0.58 0.32 290);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.93 0.02 285);
+  --sidebar-accent-foreground: oklch(0.2 0.02 285);
+  --sidebar-border: oklch(0.9 0.01 285);
+  --sidebar-ring: oklch(0.58 0.32 290 / 0.5);
 }
 
+/* ─── DARK THEME — CYBERPUNK ───
+   Deep gray + neon accents + multi-corner orbital glow.
+*/
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.13 0.02 285);              /* deep gray + mor undertone */
+  --foreground: oklch(0.97 0.005 285);
+  --card: oklch(0.165 0.02 285);
+  --card-foreground: oklch(0.97 0.005 285);
+  --popover: oklch(0.19 0.025 285);
+  --popover-foreground: oklch(0.97 0.005 285);
+  /* Primary: parlak electric purple */
+  --primary: oklch(0.72 0.32 290);
+  --primary-foreground: oklch(0.13 0.02 285);
+  --secondary: oklch(0.23 0.025 285);
+  --secondary-foreground: oklch(0.97 0.005 285);
+  --muted: oklch(0.22 0.02 285);
+  --muted-foreground: oklch(0.72 0.025 285);
+  /* Accent: neon pink */
+  --accent: oklch(0.3 0.08 350);
+  --accent-foreground: oklch(0.85 0.2 350);
+  --destructive: oklch(0.7 0.3 22);
+  --border: oklch(0.25 0.02 285);
+  --input: oklch(0.27 0.02 285);
+  --ring: oklch(0.72 0.32 290 / 0.55);
+  /* Status — neon parlak */
+  --success: oklch(0.74 0.24 145);
+  --warning: oklch(0.78 0.22 70);
+  --info: oklch(0.72 0.22 215);
+  /* Modül — neon parlak */
+  --mod-arge: oklch(0.72 0.22 215);
+  --mod-numune: oklch(0.72 0.32 290);
+  --mod-boyane: oklch(0.78 0.25 35);
+  --mod-iplik: oklch(0.74 0.3 350);
+  --mod-cozgu: oklch(0.74 0.22 145);
+  --mod-ayarlar: oklch(0.65 0.05 285);
+  --chart-1: oklch(0.72 0.32 290);
+  --chart-2: oklch(0.72 0.22 215);
+  --chart-3: oklch(0.78 0.25 35);
+  --chart-4: oklch(0.74 0.22 145);
+  --chart-5: oklch(0.74 0.3 350);
+  --sidebar: oklch(0.115 0.025 285);
+  --sidebar-foreground: oklch(0.97 0.005 285);
+  --sidebar-primary: oklch(0.72 0.32 290);
+  --sidebar-primary-foreground: oklch(0.13 0.02 285);
+  --sidebar-accent: oklch(0.21 0.03 285);
+  --sidebar-accent-foreground: oklch(0.97 0.005 285);
+  --sidebar-border: oklch(0.22 0.02 285);
+  --sidebar-ring: oklch(0.72 0.32 290 / 0.55);
 }
 
 @layer base {
@@ -123,8 +183,49 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* MULTI-CORNER ORBITAL GLOW — cyberpunk atmosfer */
+    background-image:
+      radial-gradient(
+        ellipse 60% 40% at 15% -5%,
+        color-mix(in oklch, var(--mod-numune) 15%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 50% 35% at 85% -5%,
+        color-mix(in oklch, var(--mod-iplik) 12%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 50% 110%,
+        color-mix(in oklch, var(--mod-arge) 10%, transparent),
+        transparent 65%
+      );
+    background-attachment: fixed;
   }
   html {
     @apply font-sans;
   }
+}
+
+/* ─── NEON UTILITY ANIMATIONS ─── */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow:
+      0 0 0 0 color-mix(in oklch, var(--glow-color, var(--primary)) 50%, transparent);
+  }
+  50% {
+    opacity: 0.92;
+    box-shadow:
+      0 0 0 4px color-mix(in oklch, var(--glow-color, var(--primary)) 0%, transparent);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
