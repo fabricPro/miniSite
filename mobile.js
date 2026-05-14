@@ -59,6 +59,9 @@
       //   atki:  per metre of fabric length (e.g. atkıSik × 100 for full coverage)
       tel: "",
       fiyat: "",
+      // touched: false until the user interacts; suppresses the "invalid"
+      // (red) outline on freshly created/default cards.
+      touched: false,
     };
   }
 
@@ -289,6 +292,9 @@
   function renderYarnCard(yarn, index, kind) {
     ensureRaw(yarn);
     syncYarnFromRaw(yarn);
+    // Loaded records carry data — treat them as already touched so a
+    // valid yarn shows its green border immediately.
+    if (!yarn.touched && (yarn.raw || yarn.tel || yarn.fiyat)) yarn.touched = true;
 
     var card = document.createElement("div");
     card.className = "yarn-card";
@@ -330,6 +336,7 @@
     segBtns.forEach(function (b) {
       if (b.dataset.tip === yarn.tip) b.classList.add("active");
       b.addEventListener("click", function () {
+        yarn.touched = true;
         yarn.tip = b.dataset.tip;
         segBtns.forEach(function (x) { x.classList.remove("active"); });
         b.classList.add("active");
@@ -348,6 +355,7 @@
 
     // raw input — smart parser
     rawInput.addEventListener("input", function () {
+      yarn.touched = true;
       yarn.raw = rawInput.value;
       updateYarnState(card, yarn, kind);
     });
@@ -363,6 +371,7 @@
       if (key === "raw") return;
       inp.value = yarn[key];
       inp.addEventListener("input", function () {
+        yarn.touched = true;
         yarn[key] = inp.value;
         updateYarnState(card, yarn, kind);
       });
@@ -413,7 +422,9 @@
     var parsed = syncYarnFromRaw(yarn);
     var ok = yarnValid(yarn, kind);
     card.classList.toggle("valid", ok);
-    card.classList.toggle("invalid", !ok);
+    // Only mark as invalid (red) AFTER the user has interacted —
+    // untouched default cards stay neutral.
+    card.classList.toggle("invalid", !!yarn.touched && !ok);
     var badge = card.querySelector("[data-badge]");
     badge.textContent = ok ? "✓" : "!";
 
@@ -463,8 +474,19 @@
   // ───────── Result ─────────
   function renderResult() {
     var br = window.Formulas.calcBreakdown(state.fis, state.iplikler, window.FPD);
-    $("heroTotal").textContent = fmtMoney(br.total) + " /mt";
-    $("heroName").textContent = state.currentRecordName ? "» " + state.currentRecordName : "";
+    var isEmpty = br.total <= 0 && br.grmt <= 0;
+    var heroEl = $("heroTotal");
+    heroEl.classList.toggle("empty", isEmpty);
+
+    if (isEmpty) {
+      heroEl.textContent = "—";
+      $("heroName").textContent = state.currentRecordName
+        ? "» " + state.currentRecordName
+        : "Ölçüleri ve iplikleri girin";
+    } else {
+      heroEl.textContent = fmtMoney(br.total) + " /mt";
+      $("heroName").textContent = state.currentRecordName ? "» " + state.currentRecordName : "";
+    }
 
     $("brIplik").textContent = fmtMoney(br.topI);
     $("brIscilik").textContent = fmtMoney(br.fasI);

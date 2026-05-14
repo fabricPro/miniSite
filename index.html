@@ -87,6 +87,7 @@
 
       <!-- ───────── PAGE: Maliyet (5-step wizard) ───────── -->
       <section id="pageMaliyet" class="page" hidden>
+      <div class="col col-form">
       <!-- ADIM 1 — Kumaş ölçüleri -->
       <section class="step" data-step="1">
         <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">1</span><span class="step-heading-text">Kumaş ölçüleri</span><span class="chevron" aria-hidden="true">▾</span></button>
@@ -118,20 +119,6 @@
             <small class="err" data-err="atkiSik"></small>
           </label>
         </div>
-      </section>
-
-      <!-- ADIM 2 — Çözgü iplikleri -->
-      <section class="step" data-step="2">
-        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">2</span><span class="step-heading-text">Çözgü iplikleri</span><span class="chevron" aria-hidden="true">▾</span></button>
-        <div id="cozguList" class="yarn-list"></div>
-        <button id="addCozgu" class="btn-add" type="button">+ Çözgü ipliği ekle</button>
-      </section>
-
-      <!-- ADIM 3 — Atkı iplikleri -->
-      <section class="step" data-step="3">
-        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">3</span><span class="step-heading-text">Atkı iplikleri</span><span class="chevron" aria-hidden="true">▾</span></button>
-        <div id="atkiList" class="yarn-list"></div>
-        <button id="addAtki" class="btn-add" type="button">+ Atkı ipliği ekle</button>
       </section>
 
       <!-- ADIM 4 — Üretim & finisaj -->
@@ -193,7 +180,25 @@
           </label>
         </div>
       </section>
+      </div><!-- /.col-form -->
 
+      <div class="col col-yarns">
+      <!-- ADIM 2 — Çözgü iplikleri -->
+      <section class="step" data-step="2">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">2</span><span class="step-heading-text">Çözgü iplikleri</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div id="cozguList" class="yarn-list"></div>
+        <button id="addCozgu" class="btn-add" type="button">+ Çözgü ipliği ekle</button>
+      </section>
+
+      <!-- ADIM 3 — Atkı iplikleri -->
+      <section class="step" data-step="3">
+        <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">3</span><span class="step-heading-text">Atkı iplikleri</span><span class="chevron" aria-hidden="true">▾</span></button>
+        <div id="atkiList" class="yarn-list"></div>
+        <button id="addAtki" class="btn-add" type="button">+ Atkı ipliği ekle</button>
+      </section>
+      </div><!-- /.col-yarns -->
+
+      <div class="col col-result">
       <!-- ADIM 5 — Sonuç -->
       <section class="step" data-step="5">
         <button class="step-heading" type="button" aria-expanded="true"><span class="step-num">5</span><span class="step-heading-text">Sonuç</span><span class="chevron" aria-hidden="true">▾</span></button>
@@ -222,6 +227,7 @@
           <button id="openRecords2" class="btn-secondary" type="button">📁 Kayıtlar</button>
         </div>
       </section>
+      </div><!-- /.col-result -->
       </section><!-- /#pageMaliyet -->
     </main>
 
